@@ -192,6 +192,58 @@ def get_staff_summary(start, end, limit=STAFF_HOURS_LIMIT):
     }
 
 
+def get_kitchen_summary(start, end):
+    """Average time from an order being placed to it reaching
+    preparing/ready/completed. The tricky part: two bulk queries total
+    (order id+placed_at, then their status-history rows), never one
+    query per order -- durations are then computed with plain dict
+    lookups over the already-fetched (small) result sets, which isn't
+    N+1: N+1 means issuing a *new query* per row, not doing arithmetic
+    in Python after a single fetch."""
+
+    from orders.models import OrderStatusHistory
+
+    orders = Order.objects.filter(placed_at__range=(start, end))
+
+    counts = orders.aggregate(
+        total=Count('id'),
+        cancelled=Count('id', filter=Q(status=Order.STATUS_CANCELLED)),
+    )
+
+    placed_at_by_order = dict(orders.values_list('id', 'placed_at'))
+    order_ids = list(placed_at_by_order.keys())
+
+    tracked_statuses = (Order.STATUS_PREPARING, Order.STATUS_READY, Order.STATUS_COMPLETED)
+    history_rows = OrderStatusHistory.objects.filter(
+        order_id__in=order_ids,
+        to_status__in=tracked_statuses,
+    ).values_list('order_id', 'to_status', 'changed_at')
+
+    first_reached = {}
+    for order_id, to_status, changed_at in history_rows:
+        key = (order_id, to_status)
+        if key not in first_reached or changed_at < first_reached[key]:
+            first_reached[key] = changed_at
+
+    def average_minutes(status):
+        durations = [
+            (first_reached[(order_id, status)] - placed_at_by_order[order_id]).total_seconds() / 60
+            for order_id in order_ids
+            if (order_id, status) in first_reached
+        ]
+        return round(sum(durations) / len(durations), 1) if durations else 0.0
+
+    total = counts['total']
+    cancelled = counts['cancelled']
+
+    return {
+        'avg_minutes_to_preparing': average_minutes(Order.STATUS_PREPARING),
+        'avg_minutes_to_ready': average_minutes(Order.STATUS_READY),
+        'avg_minutes_to_completed': average_minutes(Order.STATUS_COMPLETED),
+        'cancellation_rate': round((cancelled / total * 100), 1) if total else 0.0,
+    }
+
+
 def build_summary_payload(start, end, range_key):
     """The one place that assembles the full dashboard payload -- both
     the API view and the page view's initial server-render call this,
@@ -207,4 +259,5 @@ def build_summary_payload(start, end, range_key):
         'menu': get_menu_performance(start, end),
         'inventory': get_inventory_summary(start, end),
         'staff': get_staff_summary(start, end),
+        'kitchen': get_kitchen_summary(start, end),
     }

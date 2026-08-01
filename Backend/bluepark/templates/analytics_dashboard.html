@@ -166,6 +166,33 @@
             <canvas id="staffHoursChart" height="200"></canvas>
         </div>
     </section>
+
+    <!-- Kitchen -->
+    <section>
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--color-ink);">Kitchen</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Avg. time to preparing</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-avg-preparing" style="color: var(--color-ink);">0m</p>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Avg. time to ready</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-avg-ready" style="color: var(--color-ink);">0m</p>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Avg. total fulfillment</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-avg-completed" style="color: var(--color-ink);">0m</p>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Cancellation rate</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-kitchen-cancellation-rate" style="color: var(--color-ink);">0%</p>
+            </div>
+        </div>
+        <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+            <h3 class="text-sm font-semibold mb-3" style="color: var(--color-ink);">Average time by stage (minutes)</h3>
+            <canvas id="kitchenTimingChart" height="140"></canvas>
+        </div>
+    </section>
 </div>
 {% endblock %}
 
@@ -311,12 +338,33 @@
             })
         }
 
+        function renderKitchen(data) {
+            document.getElementById('stat-avg-preparing').textContent = data.avg_minutes_to_preparing + 'm'
+            document.getElementById('stat-avg-ready').textContent = data.avg_minutes_to_ready + 'm'
+            document.getElementById('stat-avg-completed').textContent = data.avg_minutes_to_completed + 'm'
+            document.getElementById('stat-kitchen-cancellation-rate').textContent = data.cancellation_rate + '%'
+
+            upsertChart('kitchenTimingChart', {
+                type: 'bar',
+                data: {
+                    labels: ['To preparing', 'To ready', 'Total fulfillment'],
+                    datasets: [{
+                        data: [data.avg_minutes_to_preparing, data.avg_minutes_to_ready, data.avg_minutes_to_completed],
+                        backgroundColor: [palette[0], palette[1], palette[3]],
+                        borderRadius: 4,
+                    }],
+                },
+                options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } },
+            })
+        }
+
         function renderAll(payload) {
             renderRevenue(payload.revenue)
             renderOrders(payload.orders)
             renderMenu(payload.menu)
             renderInventory(payload.inventory)
             renderStaff(payload.staff)
+            renderKitchen(payload.kitchen)
         }
 
         function fetchAndRender(params) {
