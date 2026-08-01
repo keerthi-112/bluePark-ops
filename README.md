@@ -10,35 +10,39 @@ The runnable application lives at **`Backend/bluepark/`**. All commands below as
 
 **App layout** — one Django app per domain, each following the same internal shape: `models.py` → `services.py` (business logic, the only thing views/API call) → `api.py` + `serializers.py` (DRF) → `views.py` (server-rendered pages) → `signals.py` where one app needs to react to another without a direct dependency (e.g. `inventory` deducting stock when `orders` fires its `order_placed` signal, without `orders` needing to know `inventory` exists):
 
-                    Browser
-                        │
-         ┌──────────────┴──────────────┐
-         │                             │
-   Server-rendered Pages          REST APIs
-         │                             │
-         └──────────────┬──────────────┘
-                        │
-                  Django Services
-                        │
-      ┌─────────────────┼─────────────────┐
-      │                 │                 │
-  Orders          Inventory         Analytics
-      │                 │                 │
-      └──────────────┬──┴─────────────────┘
-                     │
-             PostgreSQL / SQLite
-                     │
-             Django Channels
-                     │
-                Redis (Prod)
-                     │
-              WebSocket Clients
+                               BluePark Ops Architecture
 
-               AI Operations Copilot
-                     │
-            Context Builder
-                     │
-             Google Gemini API
+                                    🌐 Browser
+                                         │
+                     ┌───────────────────┴───────────────────┐
+                     │                                       │
+          Server-Rendered Pages                     REST APIs (DRF)
+                     │                                       │
+                     └───────────────────┬───────────────────┘
+                                         │
+                              Django Service Layer
+                                         │
+ ┌──────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
+ │              │              │              │              │              │
+Accounts      Orders        Inventory      Kitchen      Analytics    Notifications
+ │              │              │              │              │              │
+ └──────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
+                                         │
+                              PostgreSQL / SQLite
+                                         │
+                               Django Channels
+                                         │
+                                Redis (Production)
+                                         │
+                               WebSocket Clients
+
+                          🤖 AI Operations Copilot
+                                         │
+                                Context Builder
+                                         │
+                               AI Service Layer
+                                         │
+                              Google Gemini API
 
 | App | Owns |
 |---|---|
