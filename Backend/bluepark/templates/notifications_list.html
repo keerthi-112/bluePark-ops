@@ -1,0 +1,23 @@
+{% extends "base_dashboard.html" %}
+{% block title %}BluePark | Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="rounded-2xl border overflow-hidden max-w-2xl" style="background: var(--color-surface); border-color: var(--color-line);">
+    <div class="divide-y" style="border-color: var(--color-line);">
+        {% for notification in notifications %}
+        <div class="px-5 py-4 flex items-start justify-between gap-4">
+            <div>
+                <p class="text-sm" style="{% if notification.is_read %}color: var(--color-ink-soft);{% else %}color: var(--color-ink); font-weight: 500;{% endif %}">{{ notification.message }}</p>
+                <p class="mt-1 text-xs" style="color: var(--color-ink-soft);">{{ notification.created_at|timesince }} ago</p>
+            </div>
+            {% if not notification.is_read %}
+            <span class="mt-1 h-2 w-2 rounded-full shrink-0" style="background: var(--color-accent);"></span>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p class="px-5 py-10 text-center text-sm" style="color: var(--color-ink-soft);">No notifications yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

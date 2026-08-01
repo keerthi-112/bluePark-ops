@@ -74,6 +74,41 @@
 
                 <h1 class="text-base font-semibold flex-1" style="color: var(--color-ink);">{% block page_title %}{% endblock %}</h1>
 
+                <div x-data="{
+                    open: false,
+                    items: [],
+                    get unread() { return this.items.filter(n => !n.is_read).length },
+                    load() {
+                        fetch('/api/v1/notifications/').then(r => r.ok ? r.json() : []).then(data => { this.items = data })
+                    },
+                    markRead(item) {
+                        var csrf = document.cookie.match(/(^|;\s*)csrftoken=([^;]+)/)
+                        fetch('/api/v1/notifications/' + item.id + '/read/', {
+                            method: 'PATCH',
+                            headers: { 'X-CSRFToken': csrf ? decodeURIComponent(csrf[2]) : '' }
+                        }).then(() => { item.is_read = true })
+                    }
+                }" x-init="load()" class="relative">
+                    <button type="button" @click="open = !open" class="relative inline-flex h-9 w-9 items-center justify-center rounded-full border transition hover:opacity-80" style="border-color: var(--color-line);" aria-label="Notifications">
+                        <svg class="h-4 w-4" style="color: var(--color-ink);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                        <span x-show="unread > 0" x-text="unread" class="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white" style="background: var(--color-danger);"></span>
+                    </button>
+                    <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto rounded-xl border shadow-lg glass-panel" style="display: none;">
+                        <div class="px-4 py-3 border-b flex items-center justify-between" style="border-color: var(--color-line);">
+                            <span class="text-sm font-semibold" style="color: var(--color-ink);">Notifications</span>
+                            <a href="{% url 'notifications_list' %}" class="text-xs font-medium hover:opacity-80" style="color: var(--color-accent-ink);">View all</a>
+                        </div>
+                        <template x-if="items.length === 0">
+                            <p class="px-4 py-6 text-center text-sm" style="color: var(--color-ink-soft);">You're all caught up.</p>
+                        </template>
+                        <template x-for="item in items.slice(0, 8)" :key="item.id">
+                            <button type="button" @click="markRead(item)" class="w-full text-left px-4 py-3 border-b last:border-0 text-sm transition hover:opacity-80" style="border-color: var(--color-line);">
+                                <p :style="item.is_read ? 'color: var(--color-ink-soft);' : 'color: var(--color-ink); font-weight: 500;'" x-text="item.message"></p>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
                 <button
                     type="button"
                     @click="toggleTheme()"
