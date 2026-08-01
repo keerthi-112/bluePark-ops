@@ -42,11 +42,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    customer_username = serializers.CharField(source='customer.username', read_only=True)
 
     class Meta:
         model = Order
         fields = [
-            'id', 'status', 'order_type', 'total_amount', 'payment_status', 'payment_method',
+            'id', 'customer_username', 'status', 'order_type', 'total_amount', 'payment_status', 'payment_method',
             'delivery_address', 'phone', 'placed_at', 'items',
         ]
         read_only_fields = ['id', 'status', 'total_amount', 'payment_status', 'placed_at']

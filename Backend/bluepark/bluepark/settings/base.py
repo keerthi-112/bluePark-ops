@@ -17,12 +17,14 @@ environ.Env.read_env(BASE_DIR / '.env')
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # must be first: makes `runserver` ASGI/WebSocket-aware
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'rest_framework',
     'core.apps.CoreConfig',
     'accounts.apps.AccountsConfig',
@@ -64,6 +66,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'bluepark.wsgi.application'
+ASGI_APPLICATION = 'bluepark.asgi.application'
+
+# InMemoryChannelLayer works for a single dev process with zero extra
+# infra. Production (multiple worker processes) needs a shared layer --
+# swap this for channels_redis pointed at a REDIS_URL env var, same
+# pattern as DATABASE_URL in dev.py/prod.py.
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 
 # Password validation

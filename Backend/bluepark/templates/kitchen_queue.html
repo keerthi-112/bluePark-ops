@@ -3,65 +3,160 @@
 {% block page_title %}Kitchen Queue{% endblock %}
 
 {% block content %}
-{% if messages %}
-<div class="mb-4 space-y-2">
-    {% for message in messages %}
-    <p class="rounded-lg px-4 py-2.5 text-sm" style="background: var(--color-info-bg); color: var(--color-info);">{{ message }}</p>
-    {% endfor %}
-</div>
-{% endif %}
+{{ initial_data|json_script:"initial-queue-data" }}
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    {% for column in columns %}
-    <div class="rounded-2xl border flex flex-col" style="background: var(--color-surface); border-color: var(--color-line);">
+<div id="kanban-board" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    {% for column in initial_data.columns %}
+    <div class="rounded-2xl border flex flex-col" data-column="{{ column.status }}" style="background: var(--color-surface); border-color: var(--color-line);">
         <div class="flex items-center justify-between px-4 py-3.5 border-b" style="border-color: var(--color-line);">
             <h2 class="text-sm font-semibold" style="color: var(--color-ink);">{{ column.label }}</h2>
-            <span class="inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs font-medium" style="background: var(--color-bg); color: var(--color-ink-soft);">
-                {{ column.orders|length }}
-            </span>
+            <span class="inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs font-medium" data-count="{{ column.status }}" style="background: var(--color-bg); color: var(--color-ink-soft);">0</span>
         </div>
-
-        <div class="flex-1 p-3 space-y-3 min-h-[120px]">
-            {% for order in column.orders %}
-            <div class="rounded-xl border p-3.5 animate-fade-in" style="background: var(--color-bg); border-color: var(--color-line);">
-                <div class="flex items-start justify-between gap-2">
-                    <div>
-                        <p class="text-sm font-semibold" style="color: var(--color-ink);">#{{ order.id }}</p>
-                        <p class="text-xs" style="color: var(--color-ink-soft);">{{ order.customer.username }} &middot; {{ order.placed_at|timesince }} ago</p>
-                    </div>
-                    <span class="font-mono text-sm font-medium shrink-0" style="color: var(--color-ink);">&#8377;{{ order.total_amount }}</span>
-                </div>
-
-                <ul class="mt-2.5 space-y-1 text-xs" style="color: var(--color-ink-soft);">
-                    {% for item in order.items.all %}
-                    <li>{{ item.quantity }}&times; {{ item.menu_item.item_name }}{% if item.note %} <span class="italic">({{ item.note }})</span>{% endif %}</li>
-                    {% endfor %}
-                </ul>
-
-                <div class="mt-3 flex gap-2">
-                    <form method="post" class="flex-1">
-                        {% csrf_token %}
-                        <input type="hidden" name="order_id" value="{{ order.id }}">
-                        <input type="hidden" name="new_status" value="{{ column.next_status }}">
-                        <button type="submit" class="w-full rounded-lg py-1.5 text-xs font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
-                            Mark {{ column.next_status }}
-                        </button>
-                    </form>
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="order_id" value="{{ order.id }}">
-                        <input type="hidden" name="new_status" value="cancelled">
-                        <button type="submit" class="rounded-lg px-3 py-1.5 text-xs font-medium border transition hover:opacity-80" style="border-color: var(--color-line); color: var(--color-danger);">
-                            Cancel
-                        </button>
-                    </form>
-                </div>
-            </div>
-            {% empty %}
-            <p class="text-sm text-center py-8" style="color: var(--color-ink-soft);">No orders here.</p>
-            {% endfor %}
+        <div class="flex-1 p-3 min-h-[120px]">
+            <div class="card-list space-y-3"></div>
+            <p class="empty-message text-sm text-center py-8" data-empty-for="{{ column.status }}" style="color: var(--color-ink-soft); display: none;">No orders here.</p>
         </div>
     </div>
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        var NEXT_STATUS = { received: 'preparing', preparing: 'ready', ready: 'completed' }
+
+        function getCsrfToken() {
+            var match = document.cookie.match(/(^|;\s*)csrftoken=([^;]+)/)
+            return match ? decodeURIComponent(match[2]) : ''
+        }
+
+        function escapeHtml(value) {
+            var div = document.createElement('div')
+            div.textContent = value == null ? '' : value
+            return div.innerHTML
+        }
+
+        function cardHtml(order, nextStatus) {
+            var itemsHtml = order.items.map(function (item) {
+                var note = item.note ? ' (' + escapeHtml(item.note) + ')' : ''
+                return '<li>' + item.quantity + '&times; ' + escapeHtml(item.item_name) + note + '</li>'
+            }).join('')
+
+            var actionsHtml = '<button type="button" class="cancel-order rounded-lg px-3 py-1.5 text-xs font-medium border transition hover:opacity-80" style="border-color: var(--color-line); color: var(--color-danger);">Cancel</button>'
+            if (nextStatus) {
+                actionsHtml = '<button type="button" class="mark-next flex-1 rounded-lg py-1.5 text-xs font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);" data-next-status="' + nextStatus + '">Mark ' + nextStatus + '</button>' + actionsHtml
+            }
+
+            return '' +
+                '<div class="flex items-start justify-between gap-2">' +
+                '  <div>' +
+                '    <p class="text-sm font-semibold" style="color: var(--color-ink);">#' + order.id + '</p>' +
+                '    <p class="text-xs" style="color: var(--color-ink-soft);">' + escapeHtml(order.customer_username) + '</p>' +
+                '  </div>' +
+                '  <span class="font-mono text-sm font-medium shrink-0" style="color: var(--color-ink);">&#8377;' + order.total_amount + '</span>' +
+                '</div>' +
+                '<ul class="mt-2.5 space-y-1 text-xs" style="color: var(--color-ink-soft);">' + itemsHtml + '</ul>' +
+                '<div class="mt-3 flex gap-2">' + actionsHtml + '</div>'
+        }
+
+        function refreshColumn(status) {
+            var list = document.querySelector('[data-column="' + status + '"] .card-list')
+            var emptyMsg = document.querySelector('[data-empty-for="' + status + '"]')
+            var countEl = document.querySelector('[data-count="' + status + '"]')
+            if (!list) return
+            if (countEl) countEl.textContent = list.children.length
+            if (emptyMsg) emptyMsg.style.display = list.children.length ? 'none' : 'block'
+        }
+
+        function upsertCard(order, status) {
+            var existing = document.querySelector('[data-order-id="' + order.id + '"]')
+            var previousColumn = existing ? existing.closest('[data-column]') : null
+            if (existing) existing.remove()
+
+            var targetList = document.querySelector('[data-column="' + status + '"] .card-list')
+            if (!targetList) return
+
+            var card = document.createElement('div')
+            card.className = 'rounded-xl border p-3.5 animate-fade-in'
+            card.style.background = 'var(--color-bg)'
+            card.style.borderColor = 'var(--color-line)'
+            card.dataset.orderId = order.id
+            card.innerHTML = cardHtml(order, NEXT_STATUS[status])
+            targetList.appendChild(card)
+
+            if (previousColumn) refreshColumn(previousColumn.dataset.column)
+            refreshColumn(status)
+        }
+
+        function removeCard(orderId) {
+            var card = document.querySelector('[data-order-id="' + orderId + '"]')
+            if (!card) return
+            var column = card.closest('[data-column]')
+            card.remove()
+            if (column) refreshColumn(column.dataset.column)
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            fetch('/api/v1/orders/' + orderId + '/status/', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCsrfToken(),
+                },
+                body: new URLSearchParams({ status: newStatus }).toString(),
+            })
+                // No optimistic DOM update needed: this same change triggers a
+                // kitchen_update broadcast (see kitchen/signals.py) that comes
+                // back over the websocket and updates every connected screen,
+                // including this one.
+                .catch(function () { alert('Could not update this order.') })
+        }
+
+        document.getElementById('kanban-board').addEventListener('click', function (event) {
+            var markBtn = event.target.closest('.mark-next')
+            var cancelBtn = event.target.closest('.cancel-order')
+            if (markBtn) {
+                var card = markBtn.closest('[data-order-id]')
+                updateOrderStatus(card.dataset.orderId, markBtn.dataset.nextStatus)
+            } else if (cancelBtn) {
+                var cancelCard = cancelBtn.closest('[data-order-id]')
+                if (window.confirm('Cancel order #' + cancelCard.dataset.orderId + '?')) {
+                    updateOrderStatus(cancelCard.dataset.orderId, 'cancelled')
+                }
+            }
+        })
+
+        // Initial render from server-provided data -- the exact same
+        // upsertCard()/refreshColumn() functions the websocket uses below,
+        // so there's one card-rendering implementation, not two.
+        var initialData = JSON.parse(document.getElementById('initial-queue-data').textContent)
+        initialData.columns.forEach(function (column) {
+            column.orders.forEach(function (order) { upsertCard(order, column.status) })
+            refreshColumn(column.status)
+        })
+
+        function connectSocket() {
+            var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://'
+            var socket = new WebSocket(protocol + window.location.host + '/ws/kitchen/')
+
+            socket.onmessage = function (event) {
+                var data = JSON.parse(event.data)
+                if (data.event === 'order_created') {
+                    upsertCard(data.order, data.order.status)
+                } else if (data.event === 'order_updated') {
+                    upsertCard(data.order, data.new_status)
+                } else if (data.event === 'order_removed') {
+                    removeCard(data.order_id)
+                }
+            }
+
+            socket.onclose = function () {
+                setTimeout(connectSocket, 3000)
+            }
+        }
+
+        connectSocket()
+    })()
+</script>
 {% endblock %}
