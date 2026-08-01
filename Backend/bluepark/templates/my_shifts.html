@@ -1,0 +1,52 @@
+{% extends "base_dashboard.html" %}
+{% block title %}BluePark | My Shifts{% endblock %}
+{% block page_title %}My Shifts{% endblock %}
+
+{% block content %}
+<div x-data="{
+    clockedIn: {{ open_attendance|yesno:'true,false' }},
+    attendanceId: {{ open_attendance.id|default:'null' }},
+    error: '',
+    toggle() {
+        var csrf = document.cookie.match(/(^|;\s*)csrftoken=([^;]+)/)
+        var url = this.clockedIn ? '/api/v1/staff/attendance/' + this.attendanceId + '/clock-out/' : '/api/v1/staff/attendance/clock-in/'
+        fetch(url, { method: 'POST', headers: { 'X-CSRFToken': csrf ? decodeURIComponent(csrf[2]) : '' } })
+            .then(function (res) { if (!res.ok) throw new Error('failed'); return res.json() })
+            .then((data) => { this.clockedIn = !this.clockedIn; this.attendanceId = data.id })
+            .catch(() => { this.error = 'Could not update your attendance.' })
+    }
+}">
+    {% if not employee %}
+    <div class="rounded-2xl border p-6 text-center" style="background: var(--color-surface); border-color: var(--color-line);">
+        <p class="text-sm" style="color: var(--color-ink-soft);">No employee record is linked to your account yet -- ask a manager to add you from the Staff page.</p>
+    </div>
+    {% else %}
+    <div class="rounded-2xl border p-5 mb-6 flex items-center justify-between" style="background: var(--color-surface); border-color: var(--color-line);">
+        <div>
+            <p class="text-sm font-medium" style="color: var(--color-ink);">Shift status</p>
+            <p class="text-xs" style="color: var(--color-ink-soft);" x-text="clockedIn ? 'Clocked in' : 'Clocked out'"></p>
+        </div>
+        <button type="button" @click="toggle()" class="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+            :style="clockedIn ? 'background: var(--color-danger);' : 'background: var(--color-success);'">
+            <span x-text="clockedIn ? 'Clock out' : 'Clock in'"></span>
+        </button>
+    </div>
+    <p x-show="error" x-text="error" class="mb-4 text-sm" style="color: var(--color-danger);"></p>
+
+    <div class="rounded-2xl border overflow-hidden" style="background: var(--color-surface); border-color: var(--color-line);">
+        <div class="px-4 py-3.5 border-b" style="border-color: var(--color-line);">
+            <h2 class="text-sm font-semibold" style="color: var(--color-ink);">Upcoming shifts</h2>
+        </div>
+        <div class="divide-y" style="border-color: var(--color-line);">
+            {% for shift in shifts %}
+            <div class="px-4 py-3 text-sm" style="color: var(--color-ink);">
+                {{ shift.start_time|date:"l, M j · H:i" }} &ndash; {{ shift.end_time|date:"H:i" }}
+            </div>
+            {% empty %}
+            <p class="px-4 py-8 text-center text-sm" style="color: var(--color-ink-soft);">No upcoming shifts scheduled.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
