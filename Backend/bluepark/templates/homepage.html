@@ -23,6 +23,11 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
         <div class="lg:col-span-2 space-y-14">
+            {% if not has_menu_items %}
+            <div class="rounded-2xl border p-10 text-center" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">The menu is being updated -- check back shortly.</p>
+            </div>
+            {% endif %}
             {% for category in categories %}
                 {% if category.menu_items.all %}
                 <div>

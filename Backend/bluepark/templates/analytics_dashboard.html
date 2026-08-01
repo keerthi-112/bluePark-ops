@@ -5,19 +5,23 @@
 {% block content %}
 {{ initial_data|json_script:"initial-analytics-data" }}
 
-<div x-data="{ range: '{{ initial_data.range }}', showCustom: false, customStart: '', customEnd: '' }" class="mb-6">
+<div
+    x-data="{ range: '{{ initial_data.range }}', showCustom: false, customStart: '', customEnd: '', loading: false }"
+    @analytics-load-finished.window="loading = false"
+    class="mb-6"
+>
     <div class="flex flex-wrap items-center gap-2">
-        <button type="button" @click="range = 'today'; showCustom = false; $dispatch('analytics-range-changed', { range: 'today' })"
+        <button type="button" @click="range = 'today'; showCustom = false; loading = true; $dispatch('analytics-range-changed', { range: 'today' })"
             class="rounded-lg px-3.5 py-2 text-sm font-medium border transition"
             :style="range === 'today' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
             Today
         </button>
-        <button type="button" @click="range = '7d'; showCustom = false; $dispatch('analytics-range-changed', { range: '7d' })"
+        <button type="button" @click="range = '7d'; showCustom = false; loading = true; $dispatch('analytics-range-changed', { range: '7d' })"
             class="rounded-lg px-3.5 py-2 text-sm font-medium border transition"
             :style="range === '7d' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
             Last 7 days
         </button>
-        <button type="button" @click="range = '30d'; showCustom = false; $dispatch('analytics-range-changed', { range: '30d' })"
+        <button type="button" @click="range = '30d'; showCustom = false; loading = true; $dispatch('analytics-range-changed', { range: '30d' })"
             class="rounded-lg px-3.5 py-2 text-sm font-medium border transition"
             :style="range === '30d' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
             Last 30 days
@@ -34,12 +38,17 @@
                 <span style="color: var(--color-ink-soft);">to</span>
                 <input type="date" x-model="customEnd" class="rounded-lg border px-3 py-1.5 text-sm" style="background: var(--color-surface); border-color: var(--color-line); color: var(--color-ink);">
                 <button type="button"
-                    @click="range = 'custom'; $dispatch('analytics-range-changed', { range: 'custom', start: customStart, end: customEnd })"
+                    @click="range = 'custom'; loading = true; $dispatch('analytics-range-changed', { range: 'custom', start: customStart, end: customEnd })"
                     class="rounded-lg px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
                     Apply
                 </button>
             </div>
         </template>
+
+        <span x-show="loading" class="flex items-center gap-1.5 text-xs ml-1" style="color: var(--color-ink-soft);">
+            <span class="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background: var(--color-ink-soft);"></span>
+            Updating&hellip;
+        </span>
     </div>
 </div>
 
@@ -373,6 +382,7 @@
                 .then(function (res) { return res.json() })
                 .then(renderAll)
                 .catch(function () { /* leave last-good charts on screen */ })
+                .finally(function () { window.dispatchEvent(new CustomEvent('analytics-load-finished')) })
         }
 
         document.addEventListener('analytics-range-changed', function (event) {
