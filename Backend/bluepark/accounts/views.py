@@ -1,12 +1,21 @@
 from django.shortcuts import render,redirect
-from django.shortcuts import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
 from menu import views
-# Create your views here.
 
-def temp(request):
-    return HttpResponse('<h1>Hello!</h1>')
+from core.constants import ROLE_ADMIN, ROLE_CHEF, ROLE_MANAGER, ROLE_WAITER
+
+# Where each role lands right after login. Chef/Waiter point at 'home'
+# until the Phase 1 kitchen queue view exists (Step 8), then switch to
+# 'kitchen_queue'. Manager/Admin go to the Django admin until the
+# Phase 3 manager dashboard exists.
+ROLE_LANDING_PAGE = {
+    ROLE_CHEF: 'home',
+    ROLE_WAITER: 'home',
+    ROLE_MANAGER: 'admin:index',
+    ROLE_ADMIN: 'admin:index',
+}
+
 
 def login(request):
     if request.method=="POST":
@@ -15,7 +24,8 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request,user)
-            return redirect('home')
+            landing = ROLE_LANDING_PAGE.get(user.profile.role, 'home')
+            return redirect(landing)
         else:
             messages.info(request,'Invalid credentials')
             return redirect('login')
