@@ -1,0 +1,151 @@
+{% extends "base_dashboard.html" %}
+{% block title %}BluePark | AI Copilot{% endblock %}
+{% block page_title %}AI Copilot{% endblock %}
+
+{% block content %}
+<div
+    x-data="{
+        range: '7d',
+        showCustom: false,
+        customStart: '',
+        customEnd: '',
+        question: '',
+        loading: false,
+        messages: [
+            { role: 'assistant', text: 'Hi, I\'m the BluePark Operations Copilot. Ask me about revenue, orders, menu performance, inventory, staff, or customer feedback for the selected date range.' }
+        ],
+        suggestions: [
+            'How is revenue trending?',
+            'What are our best-selling menu items?',
+            'Any ingredients running low?',
+            'How is the kitchen performing?',
+            'Summarize today\'s operations.'
+        ],
+        rangeParams() {
+            if (this.range === 'custom') {
+                return { range: 'custom', start: this.customStart, end: this.customEnd }
+            }
+            return { range: this.range }
+        },
+        ask(text) {
+            var q = (text || this.question).trim()
+            if (!q || this.loading) return
+            this.messages.push({ role: 'user', text: q })
+            this.question = ''
+            this.loading = true
+            this.$nextTick(() => this.scrollToBottom())
+
+            var csrf = document.cookie.match(/(^|;\s*)csrftoken=([^;]+)/)
+            var query = new URLSearchParams(this.rangeParams()).toString()
+            fetch('/api/v1/ai/ask/?' + query, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrf ? decodeURIComponent(csrf[2]) : ''
+                },
+                body: JSON.stringify({ question: q })
+            })
+                .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data } }) })
+                .then((result) => {
+                    if (result.ok) {
+                        this.messages.push({ role: 'assistant', text: result.data.answer })
+                    } else {
+                        this.messages.push({ role: 'assistant', text: result.data.error || 'Something went wrong. Please try again.', isError: true })
+                    }
+                })
+                .catch(() => {
+                    this.messages.push({ role: 'assistant', text: 'Could not reach the server. Please try again.', isError: true })
+                })
+                .finally(() => {
+                    this.loading = false
+                    this.$nextTick(() => this.scrollToBottom())
+                })
+        },
+        scrollToBottom() {
+            var el = this.$refs.messageList
+            if (el) el.scrollTop = el.scrollHeight
+        }
+    }"
+    class="flex flex-col h-[calc(100vh-8rem)] max-w-3xl mx-auto"
+>
+    <!-- Range filter -->
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+        <span class="text-sm mr-1" style="color: var(--color-ink-soft);">Answering for:</span>
+        <button type="button" @click="range = 'today'; showCustom = false"
+            class="rounded-lg px-3 py-1.5 text-xs font-medium border transition"
+            :style="range === 'today' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Today
+        </button>
+        <button type="button" @click="range = '7d'; showCustom = false"
+            class="rounded-lg px-3 py-1.5 text-xs font-medium border transition"
+            :style="range === '7d' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Last 7 days
+        </button>
+        <button type="button" @click="range = '30d'; showCustom = false"
+            class="rounded-lg px-3 py-1.5 text-xs font-medium border transition"
+            :style="range === '30d' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Last 30 days
+        </button>
+        <button type="button" @click="showCustom = !showCustom; range = 'custom'"
+            class="rounded-lg px-3 py-1.5 text-xs font-medium border transition"
+            :style="range === 'custom' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Custom
+        </button>
+        <template x-if="showCustom">
+            <div class="flex items-center gap-2">
+                <input type="date" x-model="customStart" class="rounded-lg border px-2 py-1 text-xs" style="background: var(--color-surface); border-color: var(--color-line); color: var(--color-ink);">
+                <span style="color: var(--color-ink-soft);">to</span>
+                <input type="date" x-model="customEnd" class="rounded-lg border px-2 py-1 text-xs" style="background: var(--color-surface); border-color: var(--color-line); color: var(--color-ink);">
+            </div>
+        </template>
+    </div>
+
+    <!-- Messages -->
+    <div x-ref="messageList" class="flex-1 overflow-y-auto rounded-2xl border p-5 space-y-4" style="background: var(--color-surface); border-color: var(--color-line);">
+        <template x-for="(message, index) in messages" :key="index">
+            <div class="flex" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
+                <div class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap"
+                     :style="message.role === 'user'
+                        ? 'background: var(--color-accent); color: white;'
+                        : (message.isError ? 'background: var(--color-danger-bg); color: var(--color-danger);' : 'background: var(--color-bg); color: var(--color-ink);')"
+                     x-text="message.text">
+                </div>
+            </div>
+        </template>
+
+        <!-- Loading / thinking state -->
+        <div x-show="loading" class="flex justify-start">
+            <div class="rounded-2xl px-4 py-2.5 text-sm flex items-center gap-1.5" style="background: var(--color-bg); color: var(--color-ink-soft);">
+                <span class="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background: var(--color-ink-soft);"></span>
+                <span class="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background: var(--color-ink-soft); animation-delay: 150ms;"></span>
+                <span class="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style="background: var(--color-ink-soft); animation-delay: 300ms;"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suggested prompts -->
+    <div class="flex flex-wrap gap-2 mt-3" x-show="messages.length <= 1">
+        <template x-for="suggestion in suggestions" :key="suggestion">
+            <button type="button" @click="ask(suggestion)"
+                class="rounded-full px-3 py-1.5 text-xs border transition hover:opacity-80"
+                style="border-color: var(--color-line); color: var(--color-ink-soft);"
+                x-text="suggestion">
+            </button>
+        </template>
+    </div>
+
+    <!-- Input -->
+    <form @submit.prevent="ask()" class="mt-3 flex gap-2">
+        <input type="text" x-model="question" placeholder="Ask about revenue, inventory, staff, or feedback..."
+            :disabled="loading"
+            class="flex-1 rounded-lg border px-4 py-2.5 text-sm outline-none transition focus:ring-2 disabled:opacity-60"
+            style="background: var(--color-surface); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
+        <button type="submit" :disabled="loading || !question.trim()"
+            class="rounded-lg px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+            style="background: var(--color-accent);">
+            <span x-show="!loading">Send</span>
+            <span x-show="loading">Thinking&hellip;</span>
+        </button>
+    </form>
+</div>
+{% endblock %}
