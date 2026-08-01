@@ -1,110 +1,74 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  {% load static %}
-  <head>
-    <title>Website Survey Form</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-    {% block javascript %}{% endblock javascript%}
-    <link rel="stylesheet" href="{% static 'css/surveyForm.css' %}">
-  </head>
-  <body>
-    <script src="{% static 'js/surveyValidate.js' %}"></script>
-    <div class="whole">
-      <div class="header">
-        <a href="{% url 'login' %}" target="_blank">www.Bluepark.com</a>
-        <h1>Website Survey Form</h1>
-        <p>Thank you for using our Website :)<br>
-        Kindly fill up this survey, this will just take 3 minutes of your time.<br>
-        This survey will help us to provide you much better optimized services.</p>
-      </div>
-      <div class="surveyForm">
-        <form name="survey" action="" method="POST" onsubmit="return validate()">
-          {% csrf_token %}
-          <div class="formdiv">
-            <p>Have you ever heard of our Restaurant before?</p>
-              <div class="radio11">
-                <input type="radio" name="heard" id="yes" value="yes">
-                <label for="yes">Yes</label>
-              </div>
-              <div class="radio12">
-                <input type="radio" name="heard" id="no" value="no">
-                <label for="no">No</label>
-              </div>
-            <br><br>
-            <p>Where did you came to know about our Restaurant?</p>
-            <select name="platforms">
+{% extends "base_public.html" %}
+{% block title %}BluePark | Feedback{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-2xl font-semibold tracking-tight" style="color: var(--color-ink);">Tell us how we're doing</h1>
+    <p class="mt-1 text-sm" style="color: var(--color-ink-soft);">Takes about 3 minutes. It genuinely helps.</p>
+
+    <form method="POST" class="mt-8 rounded-2xl border p-6 space-y-6" style="background: var(--color-surface); border-color: var(--color-line);">
+        {% csrf_token %}
+
+        <div>
+            <label for="platforms" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Where did you hear about us?</label>
+            <select name="platforms" id="platforms"
+                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2"
+                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
                 <option value="Newspaper">Newspaper</option>
                 <option value="Ads">Advertisements</option>
                 <option value="sms">SMS</option>
                 <option value="friends">Friends</option>
-                <option value="osource" selected="selected">Other source</option>
+                <option value="osource" selected>Other source</option>
             </select>
-            <p>What is your name?</p>
-            <input type="text" name="username" id="username" placeholder="Enter your name">
-            <br>
-            <p>Have you ordered anything in our website?</p>
-            <div class="radio21">
-              <input type="radio" name="purchase" id="yes2" value="True"><label for="yes2">Yes</label>
+        </div>
+
+        <div>
+            <label for="username" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Your name</label>
+            <input type="text" name="username" id="username" placeholder="Enter your name"
+                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2"
+                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
+        </div>
+
+        <div>
+            <p class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Have you ordered with us before?</p>
+            <div class="flex gap-6 text-sm" style="color: var(--color-ink);">
+                <label class="flex items-center gap-2"><input type="radio" name="purchase" value="True" required> Yes</label>
+                <label class="flex items-center gap-2"><input type="radio" name="purchase" value="False"> No</label>
             </div>
-            <div class="radio22">
-              <input type="radio" name="purchase" id="no2" value="False"><label for="no2">No</label>
+        </div>
+
+        <div>
+            <label for="favourite" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Favourite items on our menu?</label>
+            <input type="text" name="favourite" id="favourite" placeholder="e.g. Paneer Tikka, Hyderabadi Biryani"
+                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2"
+                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
+        </div>
+
+        <div>
+            <label for="email" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Email <span style="color: var(--color-ink-soft);">(for offers, optional)</span></label>
+            <input type="email" name="email" id="email" placeholder="you@example.com"
+                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2"
+                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
+        </div>
+
+        <div x-data="{ rating: 3, emoji: ['😠', '🙁', '😐', '🙂', '😄', '🥰'] }">
+            <label class="block text-sm font-medium mb-2" style="color: var(--color-ink);">Rate your experience</label>
+            <div class="flex items-center gap-4">
+                <input type="range" name="rating" min="0" max="5" x-model.number="rating" class="flex-1 accent-[var(--color-accent)]">
+                <span class="text-2xl" x-text="emoji[rating]"></span>
             </div>
-            <br><br>
-            <p>What are your favourite food items in our Restaurant?</p>
-            <input type="text" name="favourite" id="favourite" placeholder="Enter your favourite food items">
-            <br><br>
-            <p>Enter your Mail-id to receive exciting promotional offers</p>
-            <input type="mail" name="email" id="email" placeholder="Enter your E-mail address">
-            <br><br>
-            <p>How much do you rate for our website on a scale(0-5)?</p>
-            <br>
-            <input type="range" name="rating" id="rating" class="slider" min="0" max="5" value="0">
-            <p id="colorchange">Rating: <span id="disprange"></span></p>
-            <i id="emoji" class='far fa-angry' style="font-size:48px"></i>
-            <br>
-            <script>
-              var slider = document.getElementById('rating');
-              var display = document.getElementById('disprange');
-              var emoji = document.getElementById('emoji');
-              display.innerHTML = slider.value;
-              x=document.getElementById('colorchange');
-              x.style.color="#c90000";
-              slider.oninput = function(){
-                display.innerHTML = this.value;
-                if(this.value=="0"||this.value=="1"){
-                  x.style.color="#c90000";
-                  emoji.className = "far fa-frown";
-                }
-                else if(this.value=="2"||this.value=="3"){
-                  x.style.color="#de4707";
-                }
-                else if(this.value=="4"||this.value=="5"){
-                  x.style.color="#059c1b";
-                }
-                if(this.value=="0")
-                emoji.className = "far fa-angry";
-                else if(this.value=="1")
-                emoji.className = "far fa-frown";
-               	else if(this.value=="2")
-                emoji.className = "far fa-frown-open";
-                else if(this.value=="3")
-                emoji.className = "far fa-grin";
-                else if(this.value=="4")
-                emoji.className = "far fa-grin-beam";
-                else
-                emoji.className = "far fa-grin-hearts";
-              }
-            </script>
-            <p>Please write your feedback on our services </p>
-            <textarea maxlength="300" name="feedback" id="feedback" rows="10" cols="100" placeholder="Maximum limit:150 characters"></textarea>
-            <br><br>
-            <input id="reset" type="reset" name="reset">
-            <input id="submit" type="submit" name="submit">
-            <br><br>
-          </div>
-        </form>
-      </div>
-    </div>
-  </body>
-</html>
+        </div>
+
+        <div>
+            <label for="feedback" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Anything else you'd like to share?</label>
+            <textarea name="feedback" id="feedback" maxlength="300" rows="4" placeholder="Your feedback"
+                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 resize-none"
+                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);"></textarea>
+        </div>
+
+        <button type="submit" class="w-full rounded-lg py-2.5 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
+            Submit feedback
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,122 +1,85 @@
-<html>
-    <head>
-        {% load static %}
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script type="text/javascript" src="{% static 'js/checkout.js' %}"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        {% block stylesheet %} {% endblock stylesheet%}
-        <link rel="stylesheet" type="text/css" href="{% static 'css/checkout.css' %}">
-        
-    </head>
-    <body>
-<div class="row">
-  <div class="col-75">
-    <div class="container">
-      <form action="" method="post" onsubmit="return validate()">
-        {% csrf_token %}
-        <div class="row">
-          <div class="col-50">
-            <h3>Delivery Address</h3>
-            <label for="fname"><i class="fa fa-user"></i> Full Name</label>
-            <input type="text" id="fname" name="firstname" placeholder="Enter Full Name" required>
-            <label for="adr"><i class="fa fa-address-card-o"></i> Address</label>
-            <input type="text" id="adr" name="address" placeholder="Enter Address" required>
-            <label for="city"><i class="fa fa-institution"></i> City</label>
-            <input type="text" id="city" name="city" placeholder="Vizag" disabled>
+{% extends "base_public.html" %}
+{% block title %}BluePark | Checkout{% endblock %}
 
-            <div class="row">
-              <div class="col-50">
-                <label for="state">State</label>
-                <input type="text" id="state" name="state" placeholder="Andhra Pradesh" disabled>
-              </div>
-              <div class="col-50">
-                <label for="zip">Pincode</label>
-                <input type="text" id="zip" name="zip" placeholder="Enter Pincode" required>
-              </div>
-                <div class="col-50">
-                <label for="phone">Phone number</label>
-                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="Enter Phone number" required>
-              </div>
+{% block content %}
+<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-2xl font-semibold tracking-tight mb-8" style="color: var(--color-ink);">Checkout</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+            <div class="rounded-2xl border p-6" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h2 class="text-base font-semibold mb-5" style="color: var(--color-ink);">Delivery details</h2>
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label for="adr" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Address</label>
+                        <input type="text" id="adr" name="address" placeholder="Enter address" required
+                            class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2"
+                            style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="city" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">City</label>
+                            <input type="text" id="city" name="city" value="Vizag" disabled
+                                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none opacity-60"
+                                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink);">
+                        </div>
+                        <div>
+                            <label for="state" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">State</label>
+                            <input type="text" id="state" name="state" value="Andhra Pradesh" disabled
+                                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none opacity-60"
+                                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink);">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="zip" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Pincode</label>
+                            <input type="text" id="zip" name="zip" placeholder="Enter pincode" required
+                                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2"
+                                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium mb-1.5" style="color: var(--color-ink);">Phone number</label>
+                            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="10-digit number" required
+                                class="w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2"
+                                style="background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink); --tw-ring-color: var(--color-accent);">
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg px-4 py-3 text-sm flex items-center gap-2" style="background: var(--color-info-bg); color: var(--color-info);">
+                        <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Payment is cash on delivery for now -- card payments are coming soon.
+                    </div>
+
+                    <button type="submit" class="w-full rounded-lg py-2.5 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
+                        Confirm order
+                    </button>
+                </form>
             </div>
-          </div>
-
-          <div class="col-50">
-            <h3>Payment</h3>
-            <label for="fname">Accepted Cards</label>
-            <div class="icon-container">
-              <i class="fa fa-cc-visa" style="color:navy;"></i>
-              <i class="fa fa-cc-amex" style="color:blue;"></i>
-              <i class="fa fa-cc-mastercard" style="color:red;"></i>
-              <i class="fa fa-cc-discover" style="color:orange;"></i>
-            </div>
-            <label for="cname">Name on Card</label>
-            <input type="text" id="cname" name="cardname" placeholder="Enter your Card Name">
-            <label for="ccnum">Credit card number</label>
-            <input type="text" id="ccnum" name="cardnumber" placeholder="Enter Your Card Number">
-            <label for="expmonth">Expiry Month</label>
-            <input type="text" id="expmonth" name="expmonth" placeholder="Enter Card Expiry Month ">
-
-            <div class="row">
-              <div class="col-50">
-                <label for="expyear">Expiry Year</label>
-                <input type="text" id="expyear" name="expyear" placeholder="Enter Card Expiry Year">
-              </div>
-              <div class="col-50">
-                <label for="cvv">CVV</label>
-                <input type="password" id="cvv" name="cvv" placeholder="Enter Your CVV">
-              </div>
-            </div>
-          </div>
-
         </div>
-        <label>
-          <input type="checkbox" name="cod" id="cod" onclick="paymentDisable()"> Cash On Delivery
-        </label>
-          <script type="text/javascript">
-            
-function paymentDisable()
-{
-	var cod = document.getElementById("cod");
-	if(cod.checked==true){
-		document.getElementById("cname").disabled = true;
-        document.getElementById("ccnum").disabled = true;
-        document.getElementById("expmonth").disabled = true;
-        document.getElementById("expyear").disabled = true;
-        document.getElementById("cvv").disabled = true;
-	}
-    else{
-        document.getElementById("cname").disabled = false;
-        document.getElementById("ccnum").disabled = false;
-        document.getElementById("expmonth").disabled = false;
-        document.getElementById("expyear").disabled = false;
-        document.getElementById("cvv").disabled = false;
-    }
-}
-          </script>
-          
-        <input type="submit" value="Confirm Order" class="btn" >
-      </form>
-    </div>
-  </div>
 
-  <div class="col-25">
-    <div class="container">
-      <h4>Cart&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Qty
-        <span class="price" style="color:black">
-          <i class="fa fa-shopping-cart"></i>
-          <b>{{ cart.items.count }}</b>
-        </span>
-      </h4>
-      {% for item in cart.items.all %}
-      <p>{{ item.menu_item.item_name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">{{ item.quantity }}</span> <span class="price">{{ item.subtotal }}&#8377;</span></p>
-      {% empty %}
-      <p>Your cart is empty.</p>
-      {% endfor %}
-
-      <hr>
-      <p>Total <span class="price" style="color:black"><b>{{ cart.total }}&#8377;</b></span></p>
+        <div class="lg:col-span-1">
+            <div class="lg:sticky lg:top-24 rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h2 class="text-base font-semibold" style="color: var(--color-ink);">Order summary</h2>
+                <div class="mt-4 space-y-3">
+                    {% for item in cart.items.all %}
+                    <div class="flex items-start justify-between gap-3 text-sm">
+                        <div class="min-w-0">
+                            <p class="font-medium truncate" style="color: var(--color-ink);">{{ item.menu_item.item_name }}</p>
+                            <p style="color: var(--color-ink-soft);">Qty {{ item.quantity }}</p>
+                        </div>
+                        <span class="font-mono shrink-0" style="color: var(--color-ink);">&#8377;{{ item.subtotal }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-sm py-4 text-center" style="color: var(--color-ink-soft);">Your cart is empty.</p>
+                    {% endfor %}
+                </div>
+                <div class="mt-4 pt-4 border-t flex items-center justify-between" style="border-color: var(--color-line);">
+                    <span class="text-sm font-medium" style="color: var(--color-ink);">Total</span>
+                    <span class="font-mono font-semibold" style="color: var(--color-ink);">&#8377;{{ cart.total }}</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-    </body>
-</html>
+{% endblock %}

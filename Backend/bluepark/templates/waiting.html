@@ -1,30 +1,38 @@
-<html>
-   <head>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/waiting.css' %}">
-      <script>
-         setTimeout(function(){
-            window.location.href ="{% url 'survey' %}";
-         }, 16000);
-         var timeleft = 15;
-var downloadTimer = setInterval(function(){
-		  if(timeleft <= 0){
-    clearInterval(downloadTimer);
-    document.getElementById("countdown").innerHTML = "Finished";
-  } else {
-    document.getElementById("countdown").innerHTML = timeleft + " seconds remaining";
-  }
-  timeleft -= 1;
-}, 1000);
-      </script>
-   </head>
-   <body>
-      <div class="ti">
-        <h1 style="color: white;"> <span style="color: teal;">Blue</span>Park Restaurant
-        </h1>
-         <h1>Thank You for your Purchase</h1>
-         <p>Please Leave your Valuable Feedback</p>
-		 <p>You will be directed to Survey Form in <span id="countdown"></span>
-      </div>
-   </body>
-</html>
+{% extends "base_public.html" %}
+{% block title %}BluePark | Order Placed{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+    <div class="max-w-md w-full text-center animate-slide-up">
+        <div class="mx-auto h-14 w-14 rounded-full flex items-center justify-center" style="background: var(--color-success-bg);">
+            <svg class="h-7 w-7" style="color: var(--color-success);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+        </div>
+        <h1 class="mt-6 text-2xl font-semibold tracking-tight" style="color: var(--color-ink);">Thank you for your order</h1>
+        <p class="mt-2 text-sm" style="color: var(--color-ink-soft);">The kitchen has received it and is getting started.</p>
+        <p class="mt-6 text-sm" style="color: var(--color-ink-soft);">
+            We'd love your feedback -- redirecting to a quick survey in <span id="countdown" class="font-medium" style="color: var(--color-ink);"></span>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    setTimeout(function () {
+        window.location.href = "{% url 'survey' %}";
+    }, 16000);
+
+    var timeleft = 15;
+    var countdownEl = document.getElementById('countdown');
+    countdownEl.textContent = timeleft + 's';
+    var downloadTimer = setInterval(function () {
+        if (timeleft <= 0) {
+            clearInterval(downloadTimer);
+            countdownEl.textContent = 'now...';
+        } else {
+            countdownEl.textContent = timeleft + 's';
+        }
+        timeleft -= 1;
+    }, 1000);
+</script>
+{% endblock %}
