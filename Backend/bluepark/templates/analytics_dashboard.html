@@ -1,0 +1,194 @@
+{% extends "base_dashboard.html" %}
+{% block title %}BluePark | Analytics{% endblock %}
+{% block page_title %}Analytics{% endblock %}
+
+{% block content %}
+{{ initial_data|json_script:"initial-analytics-data" }}
+
+<div x-data="{ range: '{{ initial_data.range }}', showCustom: false, customStart: '', customEnd: '' }" class="mb-6">
+    <div class="flex flex-wrap items-center gap-2">
+        <button type="button" @click="range = 'today'; showCustom = false; $dispatch('analytics-range-changed', { range: 'today' })"
+            class="rounded-lg px-3.5 py-2 text-sm font-medium border transition"
+            :style="range === 'today' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Today
+        </button>
+        <button type="button" @click="range = '7d'; showCustom = false; $dispatch('analytics-range-changed', { range: '7d' })"
+            class="rounded-lg px-3.5 py-2 text-sm font-medium border transition"
+            :style="range === '7d' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Last 7 days
+        </button>
+        <button type="button" @click="range = '30d'; showCustom = false; $dispatch('analytics-range-changed', { range: '30d' })"
+            class="rounded-lg px-3.5 py-2 text-sm font-medium border transition"
+            :style="range === '30d' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Last 30 days
+        </button>
+        <button type="button" @click="showCustom = !showCustom"
+            class="rounded-lg px-3.5 py-2 text-sm font-medium border transition"
+            :style="range === 'custom' ? 'background: var(--color-accent); color: white; border-color: var(--color-accent);' : 'border-color: var(--color-line); color: var(--color-ink);'">
+            Custom range
+        </button>
+
+        <template x-if="showCustom">
+            <div class="flex items-center gap-2 ml-2">
+                <input type="date" x-model="customStart" class="rounded-lg border px-3 py-1.5 text-sm" style="background: var(--color-surface); border-color: var(--color-line); color: var(--color-ink);">
+                <span style="color: var(--color-ink-soft);">to</span>
+                <input type="date" x-model="customEnd" class="rounded-lg border px-3 py-1.5 text-sm" style="background: var(--color-surface); border-color: var(--color-line); color: var(--color-ink);">
+                <button type="button"
+                    @click="range = 'custom'; $dispatch('analytics-range-changed', { range: 'custom', start: customStart, end: customEnd })"
+                    class="rounded-lg px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
+                    Apply
+                </button>
+            </div>
+        </template>
+    </div>
+</div>
+
+<div class="space-y-8">
+    <!-- Revenue -->
+    <section>
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--color-ink);">Revenue</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Total revenue</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-total-revenue" style="color: var(--color-ink);">&#8377;0</p>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Average order value</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-average-order-value" style="color: var(--color-ink);">&#8377;0</p>
+            </div>
+        </div>
+        <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+            <canvas id="revenueChart" height="90"></canvas>
+        </div>
+    </section>
+
+    <!-- Orders -->
+    <section>
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--color-ink);">Orders</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Total orders</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-total-orders" style="color: var(--color-ink);">0</p>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Cancellation rate</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-cancellation-rate" style="color: var(--color-ink);">0%</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h3 class="text-sm font-semibold mb-3" style="color: var(--color-ink);">Orders per day</h3>
+                <canvas id="ordersChart" height="200"></canvas>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h3 class="text-sm font-semibold mb-3" style="color: var(--color-ink);">Orders by status</h3>
+                <canvas id="orderStatusChart" height="200"></canvas>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        var style = getComputedStyle(document.documentElement)
+        var ink = style.getPropertyValue('--color-ink-soft').trim()
+        var line = style.getPropertyValue('--color-line').trim()
+        var palette = [
+            style.getPropertyValue('--color-info').trim(),
+            style.getPropertyValue('--color-warning').trim(),
+            style.getPropertyValue('--color-success').trim(),
+            style.getPropertyValue('--color-accent').trim(),
+            style.getPropertyValue('--color-danger').trim(),
+        ]
+        Chart.defaults.color = ink
+        Chart.defaults.borderColor = line
+        Chart.defaults.font.family = "'Geist Sans', ui-sans-serif, system-ui, sans-serif"
+
+        var charts = {}
+
+        function upsertChart(id, config) {
+            if (charts[id]) {
+                charts[id].data = config.data
+                charts[id].options = config.options || charts[id].options
+                charts[id].update()
+                return
+            }
+            charts[id] = new Chart(document.getElementById(id), config)
+        }
+
+        function money(value) {
+            return '₹' + Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })
+        }
+
+        function renderRevenue(data) {
+            document.getElementById('stat-total-revenue').textContent = money(data.total_revenue)
+            document.getElementById('stat-average-order-value').textContent = money(data.average_order_value)
+            upsertChart('revenueChart', {
+                type: 'line',
+                data: {
+                    labels: data.daily.map(function (d) { return d.date }),
+                    datasets: [{
+                        data: data.daily.map(function (d) { return d.revenue }),
+                        borderColor: palette[3],
+                        backgroundColor: palette[3] + '22',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        pointBackgroundColor: palette[3],
+                    }],
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
+            })
+        }
+
+        function renderOrders(data) {
+            document.getElementById('stat-total-orders').textContent = data.total_orders
+            document.getElementById('stat-cancellation-rate').textContent = data.cancellation_rate + '%'
+
+            upsertChart('ordersChart', {
+                type: 'bar',
+                data: {
+                    labels: data.daily.map(function (d) { return d.date }),
+                    datasets: [{ data: data.daily.map(function (d) { return d.count }), backgroundColor: palette[0], borderRadius: 4 }],
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+            })
+
+            upsertChart('orderStatusChart', {
+                type: 'doughnut',
+                data: { labels: data.status_labels, datasets: [{ data: data.status_data, backgroundColor: palette, borderWidth: 0 }] },
+                options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } } }, cutout: '65%' },
+            })
+        }
+
+        function renderAll(payload) {
+            renderRevenue(payload.revenue)
+            renderOrders(payload.orders)
+        }
+
+        function fetchAndRender(params) {
+            var query = new URLSearchParams(params).toString()
+            fetch('/api/v1/analytics/summary/?' + query)
+                .then(function (res) { return res.json() })
+                .then(renderAll)
+                .catch(function () { /* leave last-good charts on screen */ })
+        }
+
+        document.addEventListener('analytics-range-changed', function (event) {
+            var detail = event.detail
+            if (detail.range === 'custom') {
+                if (!detail.start || !detail.end) return
+                fetchAndRender({ range: 'custom', start: detail.start, end: detail.end })
+            } else {
+                fetchAndRender({ range: detail.range })
+            }
+        })
+
+        var initialData = JSON.parse(document.getElementById('initial-analytics-data').textContent)
+        renderAll(initialData)
+    })()
+</script>
+{% endblock %}

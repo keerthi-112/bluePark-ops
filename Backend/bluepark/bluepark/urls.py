@@ -28,6 +28,7 @@ urlpatterns = [
     path('',include('staff.urls')),
     path('',include('notifications.urls')),
     path('',include('core.urls')),
+    path('',include('analytics.urls')),
     path('api/v1/', include('accounts.api_urls')),
     path('api/v1/menu/', include('menu.api_urls')),
     path('api/v1/orders/', include('orders.api_urls')),
@@ -35,6 +36,7 @@ urlpatterns = [
     path('api/v1/inventory/', include('inventory.api_urls')),
     path('api/v1/staff/', include('staff.api_urls')),
     path('api/v1/notifications/', include('notifications.api_urls')),
+    path('api/v1/analytics/', include('analytics.api_urls')),
     path('admin/', admin.site.urls),
 ]
 

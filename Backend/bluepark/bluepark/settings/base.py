@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'inventory.apps.InventoryConfig',
     'staff.apps.StaffConfig',
     'notifications.apps.NotificationsConfig',
+    'analytics.apps.AnalyticsConfig',
 ]
 
 MIDDLEWARE = [
