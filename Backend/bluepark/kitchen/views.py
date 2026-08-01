@@ -30,6 +30,12 @@ def queue(request):
             messages.info(request, f'Order #{order.id} marked {order.get_status_display()}.')
         return redirect('kitchen_queue')
 
-    orders = get_active_orders()
-    rows = [(order, NEXT_STATUS.get(order.status)) for order in orders]
-    return render(request, 'kitchen_queue.html', {'rows': rows})
+    columns = {
+        Order.STATUS_RECEIVED: {'label': 'Received', 'next_status': NEXT_STATUS[Order.STATUS_RECEIVED], 'orders': []},
+        Order.STATUS_PREPARING: {'label': 'Preparing', 'next_status': NEXT_STATUS[Order.STATUS_PREPARING], 'orders': []},
+        Order.STATUS_READY: {'label': 'Ready', 'next_status': NEXT_STATUS[Order.STATUS_READY], 'orders': []},
+    }
+    for order in get_active_orders():
+        columns[order.status]['orders'].append(order)
+
+    return render(request, 'kitchen_queue.html', {'columns': columns.values()})
