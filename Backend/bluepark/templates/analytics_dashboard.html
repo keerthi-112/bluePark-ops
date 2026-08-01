@@ -143,6 +143,29 @@
             </div>
         </div>
     </section>
+
+    <!-- Staff -->
+    <section>
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--color-ink);">Staff</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Shifts scheduled</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-total-shifts" style="color: var(--color-ink);">0</p>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Hours worked</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-total-hours" style="color: var(--color-ink);">0</p>
+            </div>
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">On shift now</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-on-shift-now" style="color: var(--color-ink);">0</p>
+            </div>
+        </div>
+        <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+            <h3 class="text-sm font-semibold mb-3" style="color: var(--color-ink);">Hours worked by employee</h3>
+            <canvas id="staffHoursChart" height="200"></canvas>
+        </div>
+    </section>
 </div>
 {% endblock %}
 
@@ -273,11 +296,27 @@
             }).join('') || '<tr><td colspan="2" class="px-5 py-8 text-center" style="color: var(--color-ink-soft);">Nothing consumed in this range.</td></tr>'
         }
 
+        function renderStaff(data) {
+            document.getElementById('stat-total-shifts').textContent = data.total_shifts
+            document.getElementById('stat-total-hours').textContent = data.total_hours_worked + 'h'
+            document.getElementById('stat-on-shift-now').textContent = data.on_shift_now
+
+            upsertChart('staffHoursChart', {
+                type: 'bar',
+                data: {
+                    labels: data.hours_by_employee.map(function (r) { return r.employee }),
+                    datasets: [{ data: data.hours_by_employee.map(function (r) { return r.hours }), backgroundColor: palette[1], borderRadius: 4 }],
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
+            })
+        }
+
         function renderAll(payload) {
             renderRevenue(payload.revenue)
             renderOrders(payload.orders)
             renderMenu(payload.menu)
             renderInventory(payload.inventory)
+            renderStaff(payload.staff)
         }
 
         function fetchAndRender(params) {

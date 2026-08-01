@@ -7,13 +7,14 @@ Phase 3 plan for why that distinction matters)."""
 
 from decimal import Decimal
 
-from django.db.models import Avg, Count, F, Q, Sum
+from django.db.models import Avg, Count, DurationField, ExpressionWrapper, F, Q, Sum
 from django.db.models.functions import TruncDate
 
 from orders.models import Order, OrderItem
 
 MENU_PERFORMANCE_LIMIT = 10
 MOST_CONSUMED_LIMIT = 10
+STAFF_HOURS_LIMIT = 10
 
 
 def _json_number(value):
@@ -153,6 +154,44 @@ def get_inventory_summary(start, end, limit=MOST_CONSUMED_LIMIT):
     }
 
 
+def get_staff_summary(start, end, limit=STAFF_HOURS_LIMIT):
+    from staff.models import Attendance, Shift
+
+    total_shifts = Shift.objects.filter(start_time__range=(start, end)).count()
+    on_shift_now = Attendance.objects.filter(check_out__isnull=True).count()  # snapshot
+
+    worked = Attendance.objects.filter(
+        check_in__range=(start, end),
+        check_out__isnull=False,
+    )
+    duration_expr = ExpressionWrapper(F('check_out') - F('check_in'), output_field=DurationField())
+
+    total_duration = worked.aggregate(total=Sum(duration_expr))['total']
+    total_hours = round(total_duration.total_seconds() / 3600, 1) if total_duration else 0.0
+
+    hours_rows = (
+        worked
+        .annotate(duration=duration_expr)
+        .values('employee__user__username')
+        .annotate(total_duration=Sum('duration'))
+        .order_by('-total_duration')
+    )[:limit]
+    hours_by_employee = [
+        {
+            'employee': row['employee__user__username'],
+            'hours': round(row['total_duration'].total_seconds() / 3600, 1) if row['total_duration'] else 0.0,
+        }
+        for row in hours_rows
+    ]
+
+    return {
+        'total_shifts': total_shifts,
+        'on_shift_now': on_shift_now,
+        'total_hours_worked': total_hours,
+        'hours_by_employee': hours_by_employee,
+    }
+
+
 def build_summary_payload(start, end, range_key):
     """The one place that assembles the full dashboard payload -- both
     the API view and the page view's initial server-render call this,
@@ -167,4 +206,5 @@ def build_summary_payload(start, end, range_key):
         'orders': get_orders_summary(start, end),
         'menu': get_menu_performance(start, end),
         'inventory': get_inventory_summary(start, end),
+        'staff': get_staff_summary(start, end),
     }
