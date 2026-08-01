@@ -5,6 +5,7 @@ so the two never diverge on how a cart becomes an order."""
 from django.db import transaction
 
 from .models import Cart, CartItem, Order, OrderItem, OrderStatusHistory
+from .signals import order_placed, order_status_changed
 
 
 def get_active_cart(user):
@@ -63,6 +64,7 @@ def create_order_from_cart(cart, customer, order_type, payment_method, delivery_
     cart.is_active = False
     cart.save(update_fields=['is_active'])
 
+    order_placed.send(sender=Order, order=order)
     return order
 
 
@@ -73,6 +75,7 @@ def advance_order_status(order, new_status, changed_by):
     OrderStatusHistory.objects.create(
         order=order, from_status=old_status, to_status=new_status, changed_by=changed_by,
     )
+    order_status_changed.send(sender=Order, order=order, old_status=old_status, new_status=new_status, changed_by=changed_by)
     return order
 
 

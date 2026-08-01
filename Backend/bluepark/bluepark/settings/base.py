@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'survey.apps.SurveyConfig',
     'orders.apps.OrdersConfig',
     'kitchen.apps.KitchenConfig',
+    'inventory.apps.InventoryConfig',
 ]
 
 MIDDLEWARE = [
