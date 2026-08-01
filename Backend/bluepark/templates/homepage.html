@@ -1,297 +1,167 @@
+{% extends "base_public.html" %}
+{% load static %}
+{% block title %}BluePark | Menu{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food ordering system</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/homepage.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    {% block stylesheet %} {% endblock stylesheet %}
-    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-    <script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
-    {% block javascript %}{% endblock javascript %}
-</head>
-<body>
-    <section class="header">
-        <nav class="navbar">
-            <div class="navbar-box">
-                <h3 class="heading-tertiary"><span id="blue">Blue</span> Park restaurant</h3>
-            </div>
+{% block content %}
+<section class="relative h-[70vh] min-h-[420px] overflow-hidden">
+    <video loop muted autoplay playsinline class="absolute inset-0 h-full w-full object-cover">
+        <source src="{% static 'images/video.mp4' %}" type="video/mp4">
+    </video>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10"></div>
+    <div class="relative z-10 h-full flex flex-col items-start justify-end px-6 sm:px-12 pb-16 max-w-3xl">
+        <h1 class="text-4xl sm:text-6xl font-semibold tracking-tight text-white text-balance">
+            Best restaurant in Vizag
+        </h1>
+        <p class="mt-3 text-white/80 max-w-md">Order online for pickup or delivery, ready in minutes.</p>
+        <a href="#menu" class="mt-6 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
+            Order now
+        </a>
+    </div>
+</section>
 
-            <ul class="navbar-list">
-                <!--
-                <li class="navbar-item">
-                    <a href="#menucall" class="navbar-link-book">Order now</a>
-                </li>
-                -->
-                <li class="navbar-item">
-                    <a href="#cartspan" class="navbar-link-book1"><i class="fa fa-shopping-cart" >Cart</i></a>
-                </li>
-                <li class="navbar-item">
-                    <a href="{% url 'survey' %}" class="navbar-link-book1">Feedback</a>
-                </li>
-                {% if user.is_authenticated %}
-                
-                <li class="navbar-item">
-                    <span style="color: white;">Hi, {{user.username}}</span>
-                    <a href="{% url 'logout' %}" class="navbar-link-book1">Logout</a>
-                </li>
-                {% else %}
-                <li class="navbar-item">
-                    <a href="{% url 'register' %}" class="navbar-link-book1">Register</a>
-                </li>
-                <li class="navbar-item">
-                    <a href="{% url 'login' %}" class="navbar-link-book1">Login</a>
-                </li>
+<div id="menu" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+        <div class="lg:col-span-2 space-y-14">
+            {% for category in categories %}
+                {% if category.menu_items.all %}
+                <div>
+                    <h2 class="text-2xl font-semibold tracking-tight mb-6" style="color: var(--color-ink);">{{ category.name }}</h2>
+                    <div class="grid sm:grid-cols-2 gap-5">
+                        {% for menus in category.menu_items.all %}
+                        <div class="group rounded-2xl border overflow-hidden transition hover:shadow-lg hover:-translate-y-0.5" style="background: var(--color-surface); border-color: var(--color-line);">
+                            <div class="aspect-4/3 overflow-hidden">
+                                <img src="{{ menus.menuimg.url }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" alt="{{ menus.item_name }}">
+                            </div>
+                            <div class="p-4">
+                                <div class="flex items-start justify-between gap-2">
+                                    <h3 class="font-medium" style="color: var(--color-ink);">{{ menus.item_name }}</h3>
+                                    <span class="font-mono text-sm font-medium shrink-0" style="color: var(--color-ink);">&#8377;{{ menus.price }}</span>
+                                </div>
+                                <p class="mt-1 text-sm line-clamp-2" style="color: var(--color-ink-soft);">{{ menus.description }}</p>
+                                <button type="button" class="check mt-3 w-full rounded-lg py-2 text-sm font-medium transition hover:opacity-90"
+                                    data-menu-item-id="{{ menus.id }}"
+                                    style="border: 1px solid var(--color-accent); color: var(--color-accent-ink);">
+                                    Add to cart
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% endif %}
-            </ul>
-        </nav>
-        <div class="header-container">
-            <div class="video">
-                <video loop muted autoplay id="video">
-                    <source src="{% static 'images/video.mp4' %}" type="video/mp4">
-                </video>
-            </div>
-            <div class="header-box">
-                <h1 class="heading-primary">
-                    Best <br> <span id="restaurant">Restaurant</span> <br> in Vizag
-                </h1>
-                <a href="#menucall" class="book-now">Order Now</a>
+            {% endfor %}
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="lg:sticky lg:top-24 rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                {% if user.is_authenticated %}
+                <p id="login" hidden>1</p>
+                {% else %}
+                <p id="login" hidden>0</p>
+                {% endif %}
+                {{ cart_data|json_script:"initial-cart-data" }}
+
+                <h2 class="text-lg font-semibold" style="color: var(--color-ink);">Your order</h2>
+                <div id="cart-items" class="mt-4 space-y-3 max-h-80 overflow-y-auto"></div>
+                <p id="cart-empty-message" class="text-sm py-6 text-center" style="color: var(--color-ink-soft);">Your cart is empty.</p>
+
+                <div class="mt-4 pt-4 border-t flex items-center justify-between" style="border-color: var(--color-line);">
+                    <span class="text-sm font-medium" style="color: var(--color-ink);">Total</span>
+                    <span class="cart-total-price font-mono font-semibold" style="color: var(--color-ink);">&#8377;0</span>
+                </div>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'checkout' %}"><button class="btn-order mt-4 w-full rounded-lg py-2.5 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">Continue to checkout</button></a>
+                {% else %}
+                <a href="{% url 'login' %}"><button class="btn-order mt-4 w-full rounded-lg py-2.5 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">Log in to checkout</button></a>
+                {% endif %}
             </div>
         </div>
-    </section>
-    <span id="menucall"></span>
-    <section class="menu" id="menu">
-        <script type="text/javascript" src="{% static 'js/theme.js' %}"></script>
-        <button id="mode" onclick="changeTheme()">Light Mode</button>
-        
-        <div class="container">
-            <div class="menu-heading" id="menu-heading">Menu</div>
-            </div>
-            <h1 class="menu-mid" id="menu-mid">Recommended Items:</h1>
-            <br>
-            <br>
-            {% block content %}
-            <div class="menu-grid">
-                {% for menus in menu_items %}
-                    {% if menus.category.slug == "recommended" %}
-                    <div class="menu-container">
-                        <img class="menu-img imgs" src="{{menus.menuimg.url}}">
-                        <button type="button" class="check" data-menu-item-id="{{ menus.id }}">Add to Cart</button>
-                        <h1 class="menu-title">{{menus.item_name}}</h1>
-                        <p class="menu-p">{{menus.description}}</p>
-                        <h3 class="price">{{menus.price}}</h3>₹
-                    </div>
-                    {% endif %}
-                {% endfor %}         
-            </div>
-            <br>
-            <br>
-            <br>
-                <h1 class="menu-mid" id="menu-mid">Starter:</h1>
-                <br>
-                <br>
-                <div class="menu-grid1">
-                {% for menus in menu_items %}
-                    {% if menus.category.slug == "starters" %}
-                    <div class="menu-container">
-                        <img class="menu-img imgs" src="{{menus.menuimg.url}}">
-                        <button type="button" class="check" data-menu-item-id="{{ menus.id }}">Add to Cart</button>
-                        <h1 class="menu-title">{{menus.item_name}}</h1>
-                        <p class="menu-p">{{menus.description}}</p>
-                        <h3 class="price">{{menus.price}}</h3>₹
-                    </div>
-                    {% endif %}
-                {% endfor %}          
-               </div>
-               <br>
-               <br>
-        <h1 class="menu-mid" id="menu-mid">Biryani:</h1>
-        <br>
-        <div class="menu-grid1">
-        {% for menus in menu_items %}
-            {% if menus.category.slug == "biriyanis" %}
-            <div class="menu-container">
-                <img class="menu-img imgs" src="{{menus.menuimg.url}}">
-                <button type="button" class="check">Add to Cart</button>
-                <h1 class="menu-title">{{menus.item_name}}</h1>
-                <p class="menu-p">{{menus.description}}</p>
-                <h3 class="price">{{menus.price}}</h3>₹
-            </div>
-            {% endif %}
-        {% endfor %}    
-        </div>
-        <span id="cartspan"></span> 
-        {% endblock %}
-        
-        <br>
-        <br>
-        {% if user.is_authenticated %}
-        <p id="login" hidden="True">1</p>
-        {% else %}
-        <p id="login" hidden="True">0</p>
-        {% endif %}
-      <h1 class="menu-heading" id="menu-heading">Cart</h1>
-      <div class="display-cart">
-        {{ cart_data|json_script:"initial-cart-data" }}
-        <table id="cart-table" class="cart-items">
-          <tr>
-            <th>ITEM</th>
-            <th>QUANTITY</th>
-            <th>NOTE</th>
-            <th>PRICE</th>
-            <th></th>
-          </tr>
-        </table>
-        <div class="cart-total">
-          <strong class="cart-total-title">Total:&nbsp;</strong>
-          <span class="cart-total-price">0₹</span>
-        </div>
-        <script type="text/javascript">
-            if (document.readyState == 'loading') {
-                document.addEventListener('DOMContentLoaded', ready)
-            } else {
-                ready()
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', ready)
+    } else {
+        ready()
+    }
+
+    function ready() {
+        document.querySelectorAll('.check').forEach(function (btn) {
+            btn.addEventListener('click', addToCartClicked)
+        })
+
+        document.getElementById('cart-items').addEventListener('click', function (event) {
+            var removeBtn = event.target.closest('.remove-cart-item')
+            if (removeBtn) {
+                removeCartItem(removeBtn.closest('.cart-row').dataset.cartItemId)
             }
+        })
 
-            function ready() {
-                var addToCartButtons = document.getElementsByClassName('check')
-                for (var i = 0; i < addToCartButtons.length; i++) {
-                    addToCartButtons[i].addEventListener('click', addToCartClicked)
-                }
+        var initialDataEl = document.getElementById('initial-cart-data')
+        if (initialDataEl) {
+            renderCart(JSON.parse(initialDataEl.textContent))
+        }
+    }
 
-                document.getElementById('cart-table').addEventListener('click', function (event) {
-                    if (event.target.classList.contains('fa-trash')) {
-                        removeCartItem(event)
-                    }
-                })
+    function getCsrfToken() {
+        var match = document.cookie.match(/(^|;\s*)csrftoken=([^;]+)/)
+        return match ? decodeURIComponent(match[2]) : ''
+    }
 
-                var initialDataEl = document.getElementById('initial-cart-data')
-                if (initialDataEl) {
-                    renderCart(JSON.parse(initialDataEl.textContent))
-                }
+    function isLoggedIn() {
+        return document.getElementById('login').innerText === '1'
+    }
 
-                $.ajaxSetup({
-                    beforeSend: function (xhr, settings) {
-                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                            xhr.setRequestHeader('X-CSRFToken', getCsrfToken())
-                        }
-                    }
-                })
-            }
-
-            function getCsrfToken() {
-                var match = document.cookie.match(/(^|;\s*)csrftoken=([^;]+)/)
-                return match ? decodeURIComponent(match[2]) : ''
-            }
-
-            function isLoggedIn() {
-                return document.getElementById('login').innerText === '1'
-            }
-
-            function renderCart(cartData) {
-                var table = document.getElementById('cart-table')
-                var existingRows = table.getElementsByClassName('cart-row')
-                while (existingRows.length) {
-                    existingRows[0].remove()
-                }
-                var items = (cartData && cartData.items) || []
-                items.forEach(function (item) {
-                    var row = document.createElement('tr')
-                    row.classList.add('cart-row')
-                    row.dataset.cartItemId = item.id
-                    row.innerHTML = `
-                        <td class="cart-item-title">${item.item_name}</td>
-                        <td class="cart-quantity">${item.quantity}</td>
-                        <td class="cart-note">${item.note || ''}</td>
-                        <td class="cart-price cart-column">${item.subtotal}&#8377;</td>
-                        <td><i class="fa fa-trash fa-2x"></i></td>
-                    `
-                    table.appendChild(row)
-                })
-                document.getElementsByClassName('cart-total-price')[0].innerText = (cartData ? cartData.total : 0) + '₹'
-            }
-
-            function addToCartClicked(event) {
-                if (!isLoggedIn()) {
-                    window.location.href = '{% url "login" %}'
-                    return
-                }
-                $.ajax({
-                    url: '/api/v1/orders/cart/items/',
-                    method: 'POST',
-                    data: { menu_item: event.target.dataset.menuItemId, quantity: 1 },
-                    success: function (data) { renderCart(data) },
-                    error: function () { alert('Could not add this item to your cart. Please try again.') }
-                })
-            }
-
-            function removeCartItem(event) {
-                var row = event.target.closest('.cart-row')
-                $.ajax({
-                    url: '/api/v1/orders/cart/items/' + row.dataset.cartItemId + '/',
-                    method: 'DELETE',
-                    success: function (data) { renderCart(data) },
-                    error: function () { alert('Could not remove this item. Please try again.') }
-                })
-            }
-        </script>
-      </div>
-        <!--Don't forget to change the path of hyperlinks-->
-        {% if user.is_authenticated %}
-        <a href="{% url 'checkout' %}"><button class="btn-order" type="button">Continue To Checkout</button></a>
-        {% else %}
-        <a href="{% url 'login'%}"><button class="btn-order" type="button">Continue To Checkout</button></a>
-        {% endif %}
-    </section>
-    <footer>
-        <div class="footer">
-            <div class="footer-content">
-  
-                <div class="footer-section about">
-                    <h1 class="logo-text"><span>Blue</span>Park</h1>
-                    <p>
-                        Launched in Vizag, BluePark has grown from a home project to one of the largest food aggregators in the Vizag.
-                        We are enabling our vision of better food for more people. We not only connect people to food in every context but work closely with restaurants to enable a sustainable ecosystem.
-                    </p>
+    function renderCart(cartData) {
+        var container = document.getElementById('cart-items')
+        container.innerHTML = ''
+        var items = (cartData && cartData.items) || []
+        document.getElementById('cart-empty-message').style.display = items.length ? 'none' : 'block'
+        items.forEach(function (item) {
+            var row = document.createElement('div')
+            row.className = 'cart-row flex items-start justify-between gap-3 text-sm'
+            row.dataset.cartItemId = item.id
+            row.innerHTML = `
+                <div class="min-w-0">
+                    <p class="font-medium truncate" style="color: var(--color-ink);">${item.item_name}</p>
+                    <p style="color: var(--color-ink-soft);">Qty ${item.quantity} &middot; &#8377;${item.subtotal}</p>
                 </div>
-                <div class="footer-section links">
-                    <div class="div2">
-                        <h2>Quick Links</h2>
-                    <br>
-                    <ul>
-                    <a href="#"><li>Events</li></a>
-                    <a href="#"><li>Team</li></a>
-                    <a href="#"><li>Mentors</li></a>
-                    <a href="#"><li>Gallery</li></a>
-                    <a href="#"><li>Terms and conditions</li></a>
-                    </ul>
-                    </div>
-                </div>
-                 <div class="footer-section contact-form">
-                     <h2>Contact Us</h2>
-                     <br>
-                     <div class="contact">
-                        <span>9666765999</span><br>
-                        <span>info@Bluepark.com</span><br>
-                        <br>
-                        <h2>Follow Us on</h2>
-                        <br>
-                         <a href="#" class="fa fa-facebook"></a>
-                         <a href="#" class="fa fa-twitter"></a>
-                         <a href="#" class="fa fa-youtube"></a>
-                         <a href="#" class="fa fa-instagram"></a>
-                         <a href="#" class="fa fa-google"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom" style="font-size: large;">
-            &copy; bluerestuarant.com |Designed by B18 members
-                </div>
-        </div>
-      </footer>
-    </body>
-    
-</html>
+                <button type="button" class="remove-cart-item shrink-0 text-xs font-medium hover:opacity-80 transition" style="color: var(--color-danger);">Remove</button>
+            `
+            container.appendChild(row)
+        })
+        document.querySelector('.cart-total-price').innerText = '₹' + (cartData ? cartData.total : 0)
+    }
+
+    function addToCartClicked(event) {
+        if (!isLoggedIn()) {
+            window.location.href = '{% url "login" %}'
+            return
+        }
+        var body = new URLSearchParams({ menu_item: event.currentTarget.dataset.menuItemId, quantity: 1 })
+        fetch('/api/v1/orders/cart/items/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCsrfToken(), 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+            .then(function (res) { if (!res.ok) throw new Error('add failed'); return res.json() })
+            .then(renderCart)
+            .catch(function () { alert('Could not add this item to your cart. Please try again.') })
+    }
+
+    function removeCartItem(cartItemId) {
+        fetch('/api/v1/orders/cart/items/' + cartItemId + '/', {
+            method: 'DELETE',
+            headers: { 'X-CSRFToken': getCsrfToken() }
+        })
+            .then(function (res) { if (!res.ok) throw new Error('remove failed'); return res.json() })
+            .then(renderCart)
+            .catch(function () { alert('Could not remove this item. Please try again.') })
+    }
+</script>
+{% endblock %}
