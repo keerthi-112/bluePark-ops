@@ -16,9 +16,11 @@ services:
     plan: free
     rootDir: Backend/bluepark
     dockerfilePath: ./Dockerfile
-    # Overrides the image's CMD to run migrations before starting Daphne,
-    # same as docker-compose.yml's local/self-hosted path.
-    dockerCommand: sh -c "python manage.py migrate --noinput && daphne -b 0.0.0.0 -p $PORT bluepark.asgi:application"
+    # No dockerCommand override -- the image's own CMD (entrypoint.sh)
+    # runs migrations then execs daphne bound to $PORT, which Render
+    # injects automatically. Keeping the start command inside the image
+    # (rather than a string re-typed into this YAML) avoids a second
+    # place where shell quoting can silently go wrong.
     healthCheckPath: /
     envVars:
       - key: DJANGO_SETTINGS_MODULE

@@ -26,9 +26,9 @@ services:
   web:
     build: .
     restart: unless-stopped
-    # Runs migrations on every start -- safe to repeat, Django skips
-    # migrations that are already applied.
-    command: sh -c "python manage.py migrate --noinput && daphne -b 0.0.0.0 -p 8000 bluepark.asgi:application"
+    # No command override -- the image's own CMD (entrypoint.sh) runs
+    # migrations then starts daphne. Safe to restart repeatedly: Django
+    # skips migrations that are already applied.
     env_file:
       - .env
     environment:

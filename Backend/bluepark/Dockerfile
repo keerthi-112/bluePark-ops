@@ -19,6 +19,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN chmod +x entrypoint.sh
 
 # collectstatic needs *a* settings module to import, but doesn't touch
 # the database -- using settings.dev here (which has safe zero-config
@@ -32,4 +33,9 @@ ENV DJANGO_SETTINGS_MODULE=bluepark.settings.prod
 
 EXPOSE 8000
 
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "bluepark.asgi:application"]
+# entrypoint.sh runs migrations then execs daphne, binding to $PORT if
+# the platform provides one (e.g. Render assigns its own port per
+# service) or 8000 otherwise. A script baked into the image avoids
+# relying on any dashboard/compose field to correctly pass through a
+# multi-command shell string -- one less layer that can mis-parse quoting.
+CMD ["./entrypoint.sh"]
