@@ -77,7 +77,7 @@
             {% block content %}
             <div class="menu-grid">
                 {% for menus in menu_items %}
-                    {% if menus.category == "recommended" %}
+                    {% if menus.category.slug == "recommended" %}
                     <div class="menu-container">
                         <img class="menu-img imgs" src="{{menus.menuimg.url}}">
                         <button type="button" class="check">Add to Cart</button>
@@ -96,7 +96,7 @@
                 <br>
                 <div class="menu-grid1">
                 {% for menus in menu_items %}
-                    {% if menus.category == "starters" %}
+                    {% if menus.category.slug == "starters" %}
                     <div class="menu-container">
                         <img class="menu-img imgs" src="{{menus.menuimg.url}}">
                         <button type="button" class="check">Add to Cart</button>
@@ -113,7 +113,7 @@
         <br>
         <div class="menu-grid1">
         {% for menus in menu_items %}
-            {% if menus.category == "biriyanis" %}
+            {% if menus.category.slug == "biriyanis" %}
             <div class="menu-container">
                 <img class="menu-img imgs" src="{{menus.menuimg.url}}">
                 <button type="button" class="check">Add to Cart</button>

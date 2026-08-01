@@ -1,4 +1,15 @@
 from django.contrib import admin
-from .models import Menu
+from .models import Category, Menu
 
-admin.site.register(Menu)
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'display_order')
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(Menu)
+class MenuAdmin(admin.ModelAdmin):
+    list_display = ('item_name', 'category', 'price', 'is_available')
+    list_filter = ('category', 'is_available')
+    search_fields = ('item_name',)
