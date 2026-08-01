@@ -11,8 +11,20 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = False
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
+
+# Render (and similar PaaS hosts) assign the public hostname only after
+# the first deploy, so it can't be known ahead of time to put in
+# ALLOWED_HOSTS/.env. Render injects RENDER_EXTERNAL_HOSTNAME into every
+# service's environment automatically -- if present, trust it. This is
+# additive to (not a replacement for) ALLOWED_HOSTS/CSRF_TRUSTED_ORIGINS,
+# so a real ALLOWED_HOSTS is still required in any environment that
+# doesn't set this variable.
+_platform_host = env('RENDER_EXTERNAL_HOSTNAME', default='')
+if _platform_host:
+    ALLOWED_HOSTS.append(_platform_host)
+    CSRF_TRUSTED_ORIGINS.append(f'https://{_platform_host}')
 
 DATABASES = {
     'default': env.db('DATABASE_URL'),

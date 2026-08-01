@@ -1,0 +1,47 @@
+# Render Blueprint for BluePark. In the Render dashboard: New + -> Blueprint
+# -> connect this repo -> Render reads this file and provisions everything
+# below in one go. Reference: https://render.com/docs/blueprint-spec
+#
+# Not included here: Redis. Render's managed Redis/Key Value offering and
+# its Blueprint field names have changed more than once, so rather than risk
+# shipping a stale field name, REDIS_URL is left as a manual secret (see
+# envVars below) -- point it at Render's own Redis add-on (created
+# separately in the dashboard) or a free external instance (e.g. Upstash).
+# Everything else in this file is provisioned automatically.
+
+services:
+  - type: web
+    name: bluepark
+    runtime: docker
+    plan: free
+    rootDir: Backend/bluepark
+    dockerfilePath: ./Dockerfile
+    # Overrides the image's CMD to run migrations before starting Daphne,
+    # same as docker-compose.yml's local/self-hosted path.
+    dockerCommand: sh -c "python manage.py migrate --noinput && daphne -b 0.0.0.0 -p $PORT bluepark.asgi:application"
+    healthCheckPath: /
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: bluepark.settings.prod
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ""
+      - key: CSRF_TRUSTED_ORIGINS
+        value: ""
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bluepark-db
+          property: connectionString
+      - key: REDIS_URL
+        sync: false
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: GEMINI_API_KEY
+        sync: false
+
+databases:
+  - name: bluepark-db
+    plan: free
