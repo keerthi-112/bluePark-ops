@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Something went wrong | BluePark</title>
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <script>
+        if (localStorage.getItem('bluepark-theme') === 'dark' ||
+            (!localStorage.getItem('bluepark-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+<body class="font-sans antialiased min-h-screen flex items-center justify-center px-4" style="background: var(--color-bg); color: var(--color-ink);">
+    <div class="max-w-md w-full text-center">
+        <p class="text-sm font-semibold" style="color: var(--color-danger);">500</p>
+        <h1 class="mt-2 text-2xl font-semibold tracking-tight">Something went wrong</h1>
+        <p class="mt-2 text-sm" style="color: var(--color-ink-soft);">
+            An unexpected error occurred on our end. It's been logged -- please try again in a moment.
+        </p>
+        <a href="/" class="mt-6 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
+            Back to home
+        </a>
+    </div>
+</body>
+</html>
