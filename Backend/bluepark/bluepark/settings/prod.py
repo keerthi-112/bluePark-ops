@@ -69,6 +69,15 @@ STORAGES = {
     },
 }
 
+# Render (and most PaaS hosts) terminate TLS at their own edge and
+# forward to this container over plain HTTP -- without this, Django
+# can never see a request it considers "already secure", so
+# SECURE_SSL_REDIRECT below redirects every request to https://,
+# which arrives back over http:// internally, and redirects again
+# forever (ERR_TOO_MANY_REDIRECTS). Trusting X-Forwarded-Proto (which
+# the proxy sets, not the client -- Render overwrites it) fixes this.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Security headers
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
 SESSION_COOKIE_SECURE = True
