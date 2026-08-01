@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'kitchen.apps.KitchenConfig',
     'inventory.apps.InventoryConfig',
     'staff.apps.StaffConfig',
+    'notifications.apps.NotificationsConfig',
 ]
 
 MIDDLEWARE = [

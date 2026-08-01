@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/v1/kitchen/', include('kitchen.api_urls')),
     path('api/v1/inventory/', include('inventory.api_urls')),
     path('api/v1/staff/', include('staff.api_urls')),
+    path('api/v1/notifications/', include('notifications.api_urls')),
     path('admin/', admin.site.urls),
 ]
 
