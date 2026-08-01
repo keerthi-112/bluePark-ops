@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bluepark
+      POSTGRES_USER: bluepark
+      POSTGRES_PASSWORD: bluepark
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bluepark"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    # Runs migrations on every start -- safe to repeat, Django skips
+    # migrations that are already applied.
+    command: sh -c "python manage.py migrate --noinput && daphne -b 0.0.0.0 -p 8000 bluepark.asgi:application"
+    env_file:
+      - .env
+    environment:
+      # Point at the bundled db/redis services by default. Override in
+      # .env if you're using an external managed Postgres/Redis instead
+      # -- these two explicit values take precedence over anything set
+      # there, so remove them here if you do that.
+      DATABASE_URL: postgres://bluepark:bluepark@db:5432/bluepark
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    # Deliberately no volume mount over /app/media or /app/staticfiles:
+    # both are populated at build time (seed menu images are committed
+    # to the repo; collectstatic runs in the Dockerfile) and an empty
+    # named volume would shadow that build-time content on first start.
+    # Production media persistence (e.g. new images uploaded via the
+    # admin surviving a container rebuild) needs object storage (S3 or
+    # similar) wired into Django's default file storage -- not set up
+    # here; see the README's known limitations.
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

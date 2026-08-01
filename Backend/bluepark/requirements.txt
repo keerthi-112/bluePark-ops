@@ -5,3 +5,9 @@ Pillow==11.3.0
 channels==4.3.2
 daphne==4.2.3
 google-genai==2.16.0
+
+# Production only (dev uses SQLite + InMemoryChannelLayer + Django's
+# own static serving -- these aren't needed to run manage.py runserver)
+psycopg2-binary==2.9.12
+channels-redis==4.3.0
+whitenoise==6.12.0
