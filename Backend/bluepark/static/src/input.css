@@ -28,7 +28,7 @@
   --color-info: #2563eb;
   --color-info-bg: #e7eefd;
 
-  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: 'Geist Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
 
   --animate-fade-in: fade-in 0.4s ease-out;

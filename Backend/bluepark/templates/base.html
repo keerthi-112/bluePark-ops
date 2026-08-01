@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BluePark{% endblock %}</title>
+
+    <!-- Dark-mode boot: must run before first paint to avoid a flash of the wrong theme. -->
+    <script>
+        (function () {
+            var stored = localStorage.getItem('bluepark-theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (stored === 'dark' || (!stored && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.3.0/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.3.0/index.css">
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full font-sans antialiased">
+    <div x-data="{
+        theme: localStorage.getItem('bluepark-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+        toggleTheme() {
+            this.theme = this.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('bluepark-theme', this.theme);
+            document.documentElement.classList.toggle('dark', this.theme === 'dark');
+        }
+    }" class="h-full">
+        {% block body %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.12/dist/cdn.min.js" defer></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

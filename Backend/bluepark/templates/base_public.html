@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+<div class="min-h-full flex flex-col">
+    <nav class="sticky top-0 z-40 glass-panel">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{% url 'home' %}" class="flex items-center gap-2 text-lg font-semibold tracking-tight" style="color: var(--color-ink);">
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white" style="background: var(--color-accent);">B</span>
+                    BluePark
+                </a>
+
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium" style="color: var(--color-ink-soft);">
+                    <a href="{% url 'home' %}#menu" class="hover:opacity-80 transition">Menu</a>
+                    <a href="{% url 'survey' %}" class="hover:opacity-80 transition">Feedback</a>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        @click="toggleTheme()"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border transition hover:opacity-80"
+                        style="border-color: var(--color-line);"
+                        aria-label="Toggle dark mode"
+                    >
+                        <svg x-show="theme === 'light'" class="h-4 w-4" style="color: var(--color-ink);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                        <svg x-show="theme === 'dark'" class="h-4 w-4" style="color: var(--color-ink);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    </button>
+
+                    {% if user.is_authenticated %}
+                    <span class="hidden sm:inline text-sm" style="color: var(--color-ink-soft);">Hi, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">Log out</a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="text-sm font-medium hover:opacity-80 transition" style="color: var(--color-ink);">Log in</a>
+                    <a href="{% url 'register' %}" class="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">Sign up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 animate-fade-in">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t mt-16" style="border-color: var(--color-line);">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm" style="color: var(--color-ink-soft);">
+            <p>&copy; {% now "Y" %} BluePark Restaurant. Vizag.</p>
+            <div class="flex items-center gap-6">
+                <span>9666765999</span>
+                <span>info@bluepark.com</span>
+            </div>
+        </div>
+    </footer>
+</div>
+{% endblock %}
