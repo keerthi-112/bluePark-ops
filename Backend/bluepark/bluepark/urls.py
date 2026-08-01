@@ -37,6 +37,7 @@ urlpatterns = [
     path('api/v1/staff/', include('staff.api_urls')),
     path('api/v1/notifications/', include('notifications.api_urls')),
     path('api/v1/analytics/', include('analytics.api_urls')),
+    path('api/v1/ai/', include('ai_copilot.api_urls')),
     path('admin/', admin.site.urls),
 ]
 
