@@ -6,13 +6,12 @@ from menu import views
 from core.constants import ROLE_ADMIN, ROLE_CHEF, ROLE_MANAGER, ROLE_WAITER
 
 # Where each role lands right after login. Waiter points at 'home' until
-# a dedicated order-taking view exists. Manager/Admin go to the Django
-# admin until the Phase 3 manager dashboard exists.
+# a dedicated order-taking view exists.
 ROLE_LANDING_PAGE = {
     ROLE_CHEF: 'kitchen_queue',
     ROLE_WAITER: 'home',
-    ROLE_MANAGER: 'admin:index',
-    ROLE_ADMIN: 'admin:index',
+    ROLE_MANAGER: 'manager_overview',
+    ROLE_ADMIN: 'manager_overview',
 }
 
 

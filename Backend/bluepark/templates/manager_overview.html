@@ -1,0 +1,92 @@
+{% extends "base_dashboard.html" %}
+{% block title %}BluePark | Overview{% endblock %}
+{% block page_title %}Overview{% endblock %}
+
+{% block content %}
+{{ chart_data|json_script:"chart-data" }}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+    <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+        <p class="text-sm" style="color: var(--color-ink-soft);">Active orders</p>
+        <p class="mt-1 text-3xl font-semibold font-mono" style="color: var(--color-ink);">{{ active_orders_count }}</p>
+    </div>
+    <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+        <p class="text-sm" style="color: var(--color-ink-soft);">Orders today</p>
+        <p class="mt-1 text-3xl font-semibold font-mono" style="color: var(--color-ink);">{{ todays_orders_count }}</p>
+    </div>
+    <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+        <p class="text-sm" style="color: var(--color-ink-soft);">Low stock alerts</p>
+        <p class="mt-1 text-3xl font-semibold font-mono" style="color: {% if low_stock_count %}var(--color-warning){% else %}var(--color-ink){% endif %};">{{ low_stock_count }}</p>
+    </div>
+    <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+        <p class="text-sm" style="color: var(--color-ink-soft);">Staff on shift</p>
+        <p class="mt-1 text-3xl font-semibold font-mono" style="color: var(--color-ink);">{{ staff_on_shift }}</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+        <h2 class="text-sm font-semibold mb-4" style="color: var(--color-ink);">Orders by status (today)</h2>
+        <canvas id="statusChart" height="220"></canvas>
+    </div>
+    <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+        <h2 class="text-sm font-semibold mb-4" style="color: var(--color-ink);">Order volume (last 7 days)</h2>
+        <canvas id="volumeChart" height="220"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        var data = JSON.parse(document.getElementById('chart-data').textContent)
+        var style = getComputedStyle(document.documentElement)
+        var ink = style.getPropertyValue('--color-ink-soft').trim()
+        var line = style.getPropertyValue('--color-line').trim()
+        var palette = [
+            style.getPropertyValue('--color-info').trim(),
+            style.getPropertyValue('--color-warning').trim(),
+            style.getPropertyValue('--color-success').trim(),
+            style.getPropertyValue('--color-accent').trim(),
+            style.getPropertyValue('--color-danger').trim(),
+        ]
+
+        Chart.defaults.color = ink
+        Chart.defaults.borderColor = line
+        Chart.defaults.font.family = "'Geist Sans', ui-sans-serif, system-ui, sans-serif"
+
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: data.status_labels,
+                datasets: [{ data: data.status_data, backgroundColor: palette, borderWidth: 0 }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } } },
+                cutout: '65%'
+            }
+        })
+
+        new Chart(document.getElementById('volumeChart'), {
+            type: 'line',
+            data: {
+                labels: data.volume_labels,
+                datasets: [{
+                    data: data.volume_data,
+                    borderColor: palette[3],
+                    backgroundColor: palette[3] + '22',
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointBackgroundColor: palette[3],
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        })
+    })()
+</script>
+{% endblock %}
