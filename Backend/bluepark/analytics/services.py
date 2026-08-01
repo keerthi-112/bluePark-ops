@@ -13,6 +13,7 @@ from django.db.models.functions import TruncDate
 from orders.models import Order, OrderItem
 
 MENU_PERFORMANCE_LIMIT = 10
+MOST_CONSUMED_LIMIT = 10
 
 
 def _json_number(value):
@@ -113,6 +114,45 @@ def get_menu_performance(start, end, limit=MENU_PERFORMANCE_LIMIT):
     }
 
 
+def get_inventory_summary(start, end, limit=MOST_CONSUMED_LIMIT):
+    from inventory.models import StockMovement
+    from inventory.services import get_low_stock_ingredients
+
+    # Snapshot, not range-bound -- "how many ingredients are low right
+    # now" doesn't depend on the dashboard's date filter.
+    low_stock_count = get_low_stock_ingredients().count()
+
+    movements = StockMovement.objects.filter(created_at__range=(start, end))
+
+    reason_rows = movements.values('reason').annotate(total=Sum('quantity_delta'))
+    reason_by_key = {row['reason']: _json_number(row['total']) for row in reason_rows}
+    reason_labels = [label for _, label in StockMovement.REASON_CHOICES]
+    reason_data = [reason_by_key.get(key, 0) for key, _ in StockMovement.REASON_CHOICES]
+
+    consumed_rows = (
+        movements
+        .filter(reason=StockMovement.REASON_ORDER_DEDUCTION)
+        .values('ingredient__name', 'ingredient__unit')
+        .annotate(consumed=Sum('quantity_delta'))
+        .order_by('consumed')  # most negative first = most consumed
+    )[:limit]
+    most_consumed = [
+        {
+            'ingredient_name': row['ingredient__name'],
+            'unit': row['ingredient__unit'],
+            'quantity_consumed': abs(_json_number(row['consumed'])),
+        }
+        for row in consumed_rows
+    ]
+
+    return {
+        'low_stock_count': low_stock_count,
+        'reason_labels': reason_labels,
+        'reason_data': reason_data,
+        'most_consumed': most_consumed,
+    }
+
+
 def build_summary_payload(start, end, range_key):
     """The one place that assembles the full dashboard payload -- both
     the API view and the page view's initial server-render call this,
@@ -126,4 +166,5 @@ def build_summary_payload(start, end, range_key):
         'revenue': get_revenue_summary(start, end),
         'orders': get_orders_summary(start, end),
         'menu': get_menu_performance(start, end),
+        'inventory': get_inventory_summary(start, end),
     }

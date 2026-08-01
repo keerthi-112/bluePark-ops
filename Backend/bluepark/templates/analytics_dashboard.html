@@ -112,6 +112,37 @@
             </div>
         </div>
     </section>
+
+    <!-- Inventory -->
+    <section>
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--color-ink);">Inventory</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-5 mb-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <p class="text-sm" style="color: var(--color-ink-soft);">Low-stock ingredients now</p>
+                <p class="mt-1 text-2xl font-semibold font-mono" id="stat-low-stock-count" style="color: var(--color-ink);">0</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h3 class="text-sm font-semibold mb-3" style="color: var(--color-ink);">Stock movement by reason</h3>
+                <canvas id="stockReasonChart" height="220"></canvas>
+            </div>
+            <div class="rounded-2xl border overflow-hidden" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h3 class="text-sm font-semibold px-5 pt-5 mb-3" style="color: var(--color-ink);">Most-consumed ingredients</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b text-left" style="border-color: var(--color-line);">
+                                <th class="px-5 py-2.5 font-medium" style="color: var(--color-ink-soft);">Ingredient</th>
+                                <th class="px-5 py-2.5 font-medium" style="color: var(--color-ink-soft);">Consumed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mostConsumedTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}
 
@@ -221,10 +252,32 @@
             }).join('') || '<tr><td colspan="3" class="px-5 py-8 text-center" style="color: var(--color-ink-soft);">No sales in this range.</td></tr>'
         }
 
+        function renderInventory(data) {
+            document.getElementById('stat-low-stock-count').textContent = data.low_stock_count
+
+            upsertChart('stockReasonChart', {
+                type: 'bar',
+                data: {
+                    labels: data.reason_labels,
+                    datasets: [{ data: data.reason_data, backgroundColor: palette, borderRadius: 4 }],
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } },
+            })
+
+            var tbody = document.getElementById('mostConsumedTableBody')
+            tbody.innerHTML = data.most_consumed.map(function (row) {
+                return '<tr class="border-b last:border-0" style="border-color: var(--color-line);">' +
+                    '<td class="px-5 py-2.5" style="color: var(--color-ink);">' + escapeHtml(row.ingredient_name) + '</td>' +
+                    '<td class="px-5 py-2.5 font-mono" style="color: var(--color-ink);">' + row.quantity_consumed + ' ' + escapeHtml(row.unit) + '</td>' +
+                    '</tr>'
+            }).join('') || '<tr><td colspan="2" class="px-5 py-8 text-center" style="color: var(--color-ink-soft);">Nothing consumed in this range.</td></tr>'
+        }
+
         function renderAll(payload) {
             renderRevenue(payload.revenue)
             renderOrders(payload.orders)
             renderMenu(payload.menu)
+            renderInventory(payload.inventory)
         }
 
         function fetchAndRender(params) {
