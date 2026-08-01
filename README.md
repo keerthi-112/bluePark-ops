@@ -61,7 +61,7 @@ Accounts      Orders        Inventory      Kitchen      Analytics    Notificatio
 
 **Roles**: Customer, Waiter, Chef, Manager, Admin (`accounts.models.Profile.role`) — separate from Django's own `is_staff`/`is_superuser`, which gate the Django Admin (`/admin/`) instead. See `core/permissions.py` for the DRF permission classes every API view uses.
 
-**Design system**: `templates/base.html` (shared head, dark-mode boot script) → `base_public.html` (customer-facing nav/footer) or `base_dashboard.html` (staff sidebar shell) → per-page templates. Tailwind tokens live in `static/src/input.css`; compiled output (`static/css/tailwind.css`) is committed so a fresh clone works without Node.
+**Design system**: `templates/base.html` (shared head, dark-mode boot script) → `base_public.html` (customer-facing nav/footer) or `base_dashboard.html` (staff sidebar shell) → per-page templates. Tailwind tokens live in `tailwind_src/input.css` (kept outside `static/` so its `@import "tailwindcss"` build directive never gets swept into `collectstatic`); compiled output (`static/css/tailwind.css`) is committed so a fresh clone works without Node.
 
 ## Installation (local development)
 

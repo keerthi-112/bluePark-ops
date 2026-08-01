@@ -21,13 +21,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chmod +x entrypoint.sh
 
-# collectstatic needs *a* settings module to import, but doesn't touch
-# the database -- using settings.dev here (which has safe zero-config
-# fallbacks for SECRET_KEY/DATABASE_URL) avoids requiring real
-# production secrets to be present at build time, when they normally
-# aren't (those come from the environment at *run* time via
-# docker-compose / the hosting platform).
-RUN DJANGO_SETTINGS_MODULE=bluepark.settings.dev python manage.py collectstatic --noinput
+# settings.build has dev's safe zero-config fallbacks (no real
+# production secrets needed at build time) but prod's exact static
+# storage backend (WhiteNoise's manifest storage), so the manifest
+# generated here is the one settings.prod actually reads at runtime.
+RUN DJANGO_SETTINGS_MODULE=bluepark.settings.build python manage.py collectstatic --noinput
 
 ENV DJANGO_SETTINGS_MODULE=bluepark.settings.prod
 
