@@ -5,12 +5,11 @@ from menu import views
 
 from core.constants import ROLE_ADMIN, ROLE_CHEF, ROLE_MANAGER, ROLE_WAITER
 
-# Where each role lands right after login. Chef/Waiter point at 'home'
-# until the Phase 1 kitchen queue view exists (Step 8), then switch to
-# 'kitchen_queue'. Manager/Admin go to the Django admin until the
-# Phase 3 manager dashboard exists.
+# Where each role lands right after login. Waiter points at 'home' until
+# a dedicated order-taking view exists. Manager/Admin go to the Django
+# admin until the Phase 3 manager dashboard exists.
 ROLE_LANDING_PAGE = {
-    ROLE_CHEF: 'home',
+    ROLE_CHEF: 'kitchen_queue',
     ROLE_WAITER: 'home',
     ROLE_MANAGER: 'admin:index',
     ROLE_ADMIN: 'admin:index',

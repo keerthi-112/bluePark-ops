@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BluePark | Kitchen Queue</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; background: #fafafa; }
+        h1 { margin-bottom: 0.25rem; }
+        .subtitle { color: #666; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+        th { background: #222; color: #fff; }
+        .status { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 4px; font-size: 0.85rem; color: #fff; }
+        .status-received { background: #607d8b; }
+        .status-preparing { background: #f39c12; }
+        .status-ready { background: #27ae60; }
+        .items li { margin-bottom: 0.2rem; }
+        form.inline { display: inline-block; margin-right: 0.4rem; }
+        button { padding: 0.4rem 0.8rem; cursor: pointer; }
+        .empty { padding: 2rem; text-align: center; color: #777; background: #fff; border: 1px solid #ddd; }
+        .messages { list-style: none; padding: 0; margin-bottom: 1rem; }
+        .messages li { background: #e8f4fd; border: 1px solid #b7dcf5; padding: 0.5rem 0.8rem; border-radius: 4px; margin-bottom: 0.4rem; }
+    </style>
+</head>
+<body>
+    <h1>Kitchen Queue</h1>
+    <p class="subtitle">Active orders, oldest first. Logged in as {{ request.user.username }}.</p>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if rows %}
+    <table>
+        <tr>
+            <th>Order</th>
+            <th>Placed</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for order, next_status in rows %}
+        <tr>
+            <td>#{{ order.id }}<br><small>{{ order.customer.username }}</small></td>
+            <td>{{ order.placed_at }}</td>
+            <td>
+                <ul class="items">
+                    {% for item in order.items.all %}
+                    <li>{{ item.quantity }} x {{ item.menu_item.item_name }}{% if item.note %} ({{ item.note }}){% endif %}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>&#8377;{{ order.total_amount }}</td>
+            <td><span class="status status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+            <td>
+                {% if next_status %}
+                <form class="inline" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="hidden" name="new_status" value="{{ next_status }}">
+                    <button type="submit">Mark {{ next_status }}</button>
+                </form>
+                {% endif %}
+                <form class="inline" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="hidden" name="new_status" value="cancelled">
+                    <button type="submit">Cancel</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <div class="empty">No active orders right now.</div>
+    {% endif %}
+</body>
+</html>

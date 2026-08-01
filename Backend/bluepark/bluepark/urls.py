@@ -23,9 +23,11 @@ urlpatterns = [
     path('',include('menu.urls')),
     path('',include('survey.urls')),
     path('payment/',include('orders.urls')),
+    path('',include('kitchen.urls')),
     path('api/v1/', include('accounts.api_urls')),
     path('api/v1/menu/', include('menu.api_urls')),
     path('api/v1/orders/', include('orders.api_urls')),
+    path('api/v1/kitchen/', include('kitchen.api_urls')),
     path('admin/', admin.site.urls),
 ]
 

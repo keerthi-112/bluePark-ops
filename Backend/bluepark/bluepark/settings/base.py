@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'menu.apps.MenuConfig',
     'survey.apps.SurveyConfig',
     'orders.apps.OrdersConfig',
+    'kitchen.apps.KitchenConfig',
 ]
 
 MIDDLEWARE = [

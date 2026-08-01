@@ -74,3 +74,17 @@ def advance_order_status(order, new_status, changed_by):
         order=order, from_status=old_status, to_status=new_status, changed_by=changed_by,
     )
     return order
+
+
+ACTIVE_ORDER_STATUSES = [Order.STATUS_RECEIVED, Order.STATUS_PREPARING, Order.STATUS_READY]
+
+
+def get_active_orders():
+    """Orders still in the kitchen's hands, oldest first -- used by both
+    the kitchen queue page and its API equivalent."""
+    return (
+        Order.objects.filter(status__in=ACTIVE_ORDER_STATUSES)
+        .select_related('customer')
+        .prefetch_related('items')
+        .order_by('placed_at')
+    )
