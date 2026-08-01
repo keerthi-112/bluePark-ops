@@ -10,40 +10,6 @@ The runnable application lives at **`Backend/bluepark/`**. All commands below as
 
 **App layout** — one Django app per domain, each following the same internal shape: `models.py` → `services.py` (business logic, the only thing views/API call) → `api.py` + `serializers.py` (DRF) → `views.py` (server-rendered pages) → `signals.py` where one app needs to react to another without a direct dependency (e.g. `inventory` deducting stock when `orders` fires its `order_placed` signal, without `orders` needing to know `inventory` exists):
 
-                               BluePark Ops Architecture
-
-                                    🌐 Browser
-                                         │
-                     ┌───────────────────┴───────────────────┐
-                     │                                       │
-          Server-Rendered Pages                     REST APIs (DRF)
-                     │                                       │
-                     └───────────────────┬───────────────────┘
-                                         │
-                              Django Service Layer
-                                         │
- ┌──────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
- │              │              │              │              │              │
-Accounts      Orders        Inventory      Kitchen      Analytics    Notifications
- │              │              │              │              │              │
- └──────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
-                                         │
-                              PostgreSQL / SQLite
-                                         │
-                               Django Channels
-                                         │
-                                Redis (Production)
-                                         │
-                               WebSocket Clients
-
-                          🤖 AI Operations Copilot
-                                         │
-                                Context Builder
-                                         │
-                               AI Service Layer
-                                         │
-                              Google Gemini API
-
 | App | Owns |
 |---|---|
 | `core` | Shared base model, role-based DRF permission classes, the Phase 2 "Overview" snapshot dashboard |
