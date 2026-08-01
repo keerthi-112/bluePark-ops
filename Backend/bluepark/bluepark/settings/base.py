@@ -28,8 +28,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'menu.apps.MenuConfig',
     'survey.apps.SurveyConfig',
-    'cart.apps.CartConfig',
-    'checkout.apps.CheckoutConfig',
+    'orders.apps.OrdersConfig',
 ]
 
 MIDDLEWARE = [

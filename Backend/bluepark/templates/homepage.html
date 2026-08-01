@@ -9,7 +9,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/homepage.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     {% block stylesheet %} {% endblock stylesheet %}
-    <!--<script type="text/javascript" src="{% static 'js/cartpage.js' %}" async></script>-->
     <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
     <script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
     {% block javascript %}{% endblock javascript %}
@@ -80,7 +79,7 @@
                     {% if menus.category.slug == "recommended" %}
                     <div class="menu-container">
                         <img class="menu-img imgs" src="{{menus.menuimg.url}}">
-                        <button type="button" class="check">Add to Cart</button>
+                        <button type="button" class="check" data-menu-item-id="{{ menus.id }}">Add to Cart</button>
                         <h1 class="menu-title">{{menus.item_name}}</h1>
                         <p class="menu-p">{{menus.description}}</p>
                         <h3 class="price">{{menus.price}}</h3>₹
@@ -99,7 +98,7 @@
                     {% if menus.category.slug == "starters" %}
                     <div class="menu-container">
                         <img class="menu-img imgs" src="{{menus.menuimg.url}}">
-                        <button type="button" class="check">Add to Cart</button>
+                        <button type="button" class="check" data-menu-item-id="{{ menus.id }}">Add to Cart</button>
                         <h1 class="menu-title">{{menus.item_name}}</h1>
                         <p class="menu-p">{{menus.description}}</p>
                         <h3 class="price">{{menus.price}}</h3>₹
@@ -136,150 +135,109 @@
         {% endif %}
       <h1 class="menu-heading" id="menu-heading">Cart</h1>
       <div class="display-cart">
-          <script type="text/javascript">
-            if (document.readyState == 'loading') {
-                document.addEventListener('DOMContentLoaded', ready)
-            } else {
-                ready()
-            }
-            
-            function ready() {
-                var removeCartItemButtons = document.getElementsByClassName('fa-trash')
-                for (var i = 0; i < removeCartItemButtons.length; i++) {
-                    var button = removeCartItemButtons[i]
-                    button.addEventListener('click', removeCartItem)
-                }
-            
-                var quantityInputs = document.getElementsByClassName('cart-quantity-input')
-                for (var i = 0; i < quantityInputs.length; i++) {
-                    var input = quantityInputs[i]
-                    input.addEventListener('change', quantityChanged)
-                }
-            
-                var addToCartButtons = document.getElementsByClassName('check')
-                for (var i = 0; i < addToCartButtons.length; i++) {
-                    var button = addToCartButtons[i]
-                    button.addEventListener('click', addToCartClicked)
-                }
-            
-                document.getElementsByClassName('btn-order')[0].addEventListener('click', purchaseClicked)
-            }
-            
-            function purchaseClicked() {
-                var cartItems = document.getElementsByClassName('cart-items')[0]
-                while (cartItems.hasChildNodes()) {
-                    cartItems.removeChild(cartItems.firstChild)
-                }
-                updateCartTotal()
-            }
-            
-            function removeCartItem(event) {
-                var buttonClicked = event.target
-                buttonClicked.parentElement.parentElement.remove()
-                updateCartTotal()
-            }
-            
-            function quantityChanged(event) {
-                var input = event.target
-                if (isNaN(input.value) || input.value <= 0) {
-                    input.value = 1
-                }
-                updateCartTotal()
-            }
-            
-            function addToCartClicked(event) {
-                var button = event.target
-                var menuItem = button.parentElement
-                var title = menuItem.getElementsByClassName('menu-title')[0].innerText
-                var price = menuItem.getElementsByClassName('price')[0].innerText
-                var imageSrc = menuItem.getElementsByClassName('imgs')[0].src
-                addItemToCart(title, price)
-                updateCartTotal()
-            }
-            
-            function addItemToCart(title, price) {
-                var count = 0
-                var login = document.getElementById('login').innerText
-                console.log(login)
-                var cartRow = document.createElement('tr')
-                cartRow.classList.add('cart-row')
-                var cartItems = document.getElementsByClassName('cart-items')[0]
-                var cartItemNames = cartItems.getElementsByClassName('cart-item-title')
-                for (var i = 0; i < cartItemNames.length; i++) {
-                    count = count + 1;
-                    if (cartItemNames[i].innerText == title) {
-                        alert('This item is already added to the cart')
-                        return
-                    }
-                    else{
-                            $.ajax({
-                                url: '{% url "cart_add" %}',
-                                data: {
-                                    'login': login,
-                                    'title': title,
-                                    'price': price,
-                                    'count': (count>=1)?1:0
-                                },
-                                dataType: 'json',
-                                success: function (data) {
-                                    if (data) {
-                                        
-                                    }
-                                }
-                            });
-                        }
-                    }
-                
-                var cartRowContents = `
-                    <td class="cart-item-title">${title}</td>
-                    <td class="cart-quantity">
-                        <input class="cart-quantity-input" type="number" value="1" max="6">  
-                    </td>
-                    <td>
-                      <span class="cart-note"><input type="text" class="txt1"></span>
-                      <i class="fa fa-trash fa-2x"></i>
-                    </td>
-                    <td class="cart-price cart-column">${price}
-                    </td>
-                    `
-            
-                cartRow.innerHTML = cartRowContents
-                cartItems.append(cartRow)
-                cartRow.getElementsByClassName('fa-trash')[0].addEventListener('click', removeCartItem)
-                cartRow.getElementsByClassName('cart-quantity-input')[0].addEventListener('change', quantityChanged)
-            
-            }
-            
-            function updateCartTotal() {
-                var cartItemContainer = document.getElementsByClassName('cart-items')[0]
-                var cartRows = cartItemContainer.getElementsByClassName('cart-row')
-                var total = 0
-                for (var i = 0; i < cartRows.length; i++) {
-                    var cartRow = cartRows[i]
-                    var priceElement = cartRow.getElementsByClassName('cart-price')[0]
-                    var quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0]
-                    var price = parseFloat(priceElement.innerText.replace('$', ''))
-                    var quantity = quantityElement.value
-                    total = total + (price * quantity)
-                }
-                total = Math.round(total * 100) / 100
-                document.getElementsByClassName('cart-total-price')[0].innerText = total+'₹'
-            }
-            
-            
-          </script>
+        {{ cart_data|json_script:"initial-cart-data" }}
         <table id="cart-table" class="cart-items">
           <tr>
             <th>ITEM</th>
             <th>QUANTITY</th>
             <th>NOTE</th>
             <th>PRICE</th>
+            <th></th>
           </tr>
         </table>
         <div class="cart-total">
           <strong class="cart-total-title">Total:&nbsp;</strong>
           <span class="cart-total-price">0₹</span>
         </div>
+        <script type="text/javascript">
+            if (document.readyState == 'loading') {
+                document.addEventListener('DOMContentLoaded', ready)
+            } else {
+                ready()
+            }
+
+            function ready() {
+                var addToCartButtons = document.getElementsByClassName('check')
+                for (var i = 0; i < addToCartButtons.length; i++) {
+                    addToCartButtons[i].addEventListener('click', addToCartClicked)
+                }
+
+                document.getElementById('cart-table').addEventListener('click', function (event) {
+                    if (event.target.classList.contains('fa-trash')) {
+                        removeCartItem(event)
+                    }
+                })
+
+                var initialDataEl = document.getElementById('initial-cart-data')
+                if (initialDataEl) {
+                    renderCart(JSON.parse(initialDataEl.textContent))
+                }
+
+                $.ajaxSetup({
+                    beforeSend: function (xhr, settings) {
+                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                            xhr.setRequestHeader('X-CSRFToken', getCsrfToken())
+                        }
+                    }
+                })
+            }
+
+            function getCsrfToken() {
+                var match = document.cookie.match(/(^|;\s*)csrftoken=([^;]+)/)
+                return match ? decodeURIComponent(match[2]) : ''
+            }
+
+            function isLoggedIn() {
+                return document.getElementById('login').innerText === '1'
+            }
+
+            function renderCart(cartData) {
+                var table = document.getElementById('cart-table')
+                var existingRows = table.getElementsByClassName('cart-row')
+                while (existingRows.length) {
+                    existingRows[0].remove()
+                }
+                var items = (cartData && cartData.items) || []
+                items.forEach(function (item) {
+                    var row = document.createElement('tr')
+                    row.classList.add('cart-row')
+                    row.dataset.cartItemId = item.id
+                    row.innerHTML = `
+                        <td class="cart-item-title">${item.item_name}</td>
+                        <td class="cart-quantity">${item.quantity}</td>
+                        <td class="cart-note">${item.note || ''}</td>
+                        <td class="cart-price cart-column">${item.subtotal}&#8377;</td>
+                        <td><i class="fa fa-trash fa-2x"></i></td>
+                    `
+                    table.appendChild(row)
+                })
+                document.getElementsByClassName('cart-total-price')[0].innerText = (cartData ? cartData.total : 0) + '₹'
+            }
+
+            function addToCartClicked(event) {
+                if (!isLoggedIn()) {
+                    window.location.href = '{% url "login" %}'
+                    return
+                }
+                $.ajax({
+                    url: '/api/v1/orders/cart/items/',
+                    method: 'POST',
+                    data: { menu_item: event.target.dataset.menuItemId, quantity: 1 },
+                    success: function (data) { renderCart(data) },
+                    error: function () { alert('Could not add this item to your cart. Please try again.') }
+                })
+            }
+
+            function removeCartItem(event) {
+                var row = event.target.closest('.cart-row')
+                $.ajax({
+                    url: '/api/v1/orders/cart/items/' + row.dataset.cartItemId + '/',
+                    method: 'DELETE',
+                    success: function (data) { renderCart(data) },
+                    error: function () { alert('Could not remove this item. Please try again.') }
+                })
+            }
+        </script>
       </div>
         <!--Don't forget to change the path of hyperlinks-->
         {% if user.is_authenticated %}

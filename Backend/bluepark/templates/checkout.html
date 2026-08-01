@@ -104,15 +104,17 @@ function paymentDisable()
       <h4>Cart&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Qty
         <span class="price" style="color:black">
           <i class="fa fa-shopping-cart"></i>
-          <b>4</b>
+          <b>{{ cart.items.count }}</b>
         </span>
       </h4>
-      <p>Product 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">1</span> <span class="price">15Rs.</span></p>
-      <p>Product 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">2</span> <span class="price">5Rs.</span></p>
-      <p>Product 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">1</span> <span class="price">8Rs.</span></p>
-     
+      {% for item in cart.items.all %}
+      <p>{{ item.menu_item.item_name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">{{ item.quantity }}</span> <span class="price">{{ item.subtotal }}&#8377;</span></p>
+      {% empty %}
+      <p>Your cart is empty.</p>
+      {% endfor %}
+
       <hr>
-      <p>Total <span class="price" style="color:black"><b>30rs</b></span></p>
+      <p>Total <span class="price" style="color:black"><b>{{ cart.total }}&#8377;</b></span></p>
     </div>
   </div>
 </div>
