@@ -7,10 +7,12 @@ Phase 3 plan for why that distinction matters)."""
 
 from decimal import Decimal
 
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Avg, Count, F, Q, Sum
 from django.db.models.functions import TruncDate
 
-from orders.models import Order
+from orders.models import Order, OrderItem
+
+MENU_PERFORMANCE_LIMIT = 10
 
 
 def _json_number(value):
@@ -77,4 +79,51 @@ def get_orders_summary(start, end):
         'status_labels': status_labels,
         'status_data': status_data,
         'daily': daily,
+    }
+
+
+def get_menu_performance(start, end, limit=MENU_PERFORMANCE_LIMIT):
+    """Two grouped-aggregate queries -- each proportional to the number
+    of distinct menu items sold, not to the number of orders/items."""
+
+    base = (
+        OrderItem.objects
+        .filter(order__placed_at__range=(start, end))
+        .exclude(order__status=Order.STATUS_CANCELLED)
+        .values('menu_item__item_name')
+        .annotate(
+            quantity_sold=Sum('quantity'),
+            revenue=Sum(F('quantity') * F('unit_price_at_order_time')),
+        )
+    )
+
+    def _rows(queryset):
+        return [
+            {
+                'item_name': row['menu_item__item_name'],
+                'quantity_sold': row['quantity_sold'],
+                'revenue': _json_number(row['revenue']),
+            }
+            for row in queryset
+        ]
+
+    return {
+        'top_by_revenue': _rows(base.order_by('-revenue')[:limit]),
+        'top_by_quantity': _rows(base.order_by('-quantity_sold')[:limit]),
+    }
+
+
+def build_summary_payload(start, end, range_key):
+    """The one place that assembles the full dashboard payload -- both
+    the API view and the page view's initial server-render call this,
+    so adding a section here is the only place it needs to be added
+    (instead of every caller)."""
+
+    return {
+        'range': range_key,
+        'start': start.date().isoformat(),
+        'end': end.date().isoformat(),
+        'revenue': get_revenue_summary(start, end),
+        'orders': get_orders_summary(start, end),
+        'menu': get_menu_performance(start, end),
     }

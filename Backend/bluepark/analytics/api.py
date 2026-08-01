@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 
 from core.permissions import IsManagerOrAdmin
 
-from . import services
 from .dateranges import resolve_range
+from .services import build_summary_payload
 
 
 class AnalyticsSummaryView(APIView):
@@ -16,11 +16,4 @@ class AnalyticsSummaryView(APIView):
 
     def get(self, request):
         start, end, range_key = resolve_range(request)
-
-        return Response({
-            'range': range_key,
-            'start': start.date().isoformat(),
-            'end': end.date().isoformat(),
-            'revenue': services.get_revenue_summary(start, end),
-            'orders': services.get_orders_summary(start, end),
-        })
+        return Response(build_summary_payload(start, end, range_key))

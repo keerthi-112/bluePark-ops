@@ -86,6 +86,32 @@
             </div>
         </div>
     </section>
+
+    <!-- Menu performance -->
+    <section>
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--color-ink);">Menu Performance</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="rounded-2xl border p-5" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h3 class="text-sm font-semibold mb-3" style="color: var(--color-ink);">Top 5 items by revenue</h3>
+                <canvas id="menuRevenueChart" height="220"></canvas>
+            </div>
+            <div class="rounded-2xl border overflow-hidden" style="background: var(--color-surface); border-color: var(--color-line);">
+                <h3 class="text-sm font-semibold px-5 pt-5 mb-3" style="color: var(--color-ink);">Top 10 items by quantity sold</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b text-left" style="border-color: var(--color-line);">
+                                <th class="px-5 py-2.5 font-medium" style="color: var(--color-ink-soft);">Item</th>
+                                <th class="px-5 py-2.5 font-medium" style="color: var(--color-ink-soft);">Qty sold</th>
+                                <th class="px-5 py-2.5 font-medium" style="color: var(--color-ink-soft);">Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuQuantityTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}
 
@@ -164,9 +190,41 @@
             })
         }
 
+        function escapeHtml(value) {
+            var div = document.createElement('div')
+            div.textContent = value == null ? '' : value
+            return div.innerHTML
+        }
+
+        function renderMenu(data) {
+            var top5 = data.top_by_revenue.slice(0, 5)
+            upsertChart('menuRevenueChart', {
+                type: 'bar',
+                data: {
+                    labels: top5.map(function (r) { return r.item_name }),
+                    datasets: [{ data: top5.map(function (r) { return r.revenue }), backgroundColor: palette[2], borderRadius: 4 }],
+                },
+                options: {
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } },
+                },
+            })
+
+            var tbody = document.getElementById('menuQuantityTableBody')
+            tbody.innerHTML = data.top_by_quantity.map(function (row) {
+                return '<tr class="border-b last:border-0" style="border-color: var(--color-line);">' +
+                    '<td class="px-5 py-2.5" style="color: var(--color-ink);">' + escapeHtml(row.item_name) + '</td>' +
+                    '<td class="px-5 py-2.5 font-mono" style="color: var(--color-ink);">' + row.quantity_sold + '</td>' +
+                    '<td class="px-5 py-2.5 font-mono" style="color: var(--color-ink-soft);">' + money(row.revenue) + '</td>' +
+                    '</tr>'
+            }).join('') || '<tr><td colspan="3" class="px-5 py-8 text-center" style="color: var(--color-ink-soft);">No sales in this range.</td></tr>'
+        }
+
         function renderAll(payload) {
             renderRevenue(payload.revenue)
             renderOrders(payload.orders)
+            renderMenu(payload.menu)
         }
 
         function fetchAndRender(params) {
