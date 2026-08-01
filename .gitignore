@@ -7,6 +7,10 @@ __pycache__/
 Backend/bluepark/db.sqlite3
 Backend/bluepark/staticfiles/
 
+# Node (Tailwind build tooling) -- static/css/tailwind.css IS committed
+# since there's no CI/Docker build step yet; node_modules is not.
+Backend/bluepark/node_modules/
+
 # Environment
 .env
 *.env.local

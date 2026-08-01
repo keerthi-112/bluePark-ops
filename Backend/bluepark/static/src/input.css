@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/* Manual dark mode: `dark:` utilities key off a `.dark` class on <html>,
+   toggled by the boot script + toggle button in templates/base.html,
+   rather than only following the OS `prefers-color-scheme`. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary accent -- confident indigo-violet, distinct from the
+     semantic colors below. Redefined for dark under .dark. */
+  --color-accent: #6D5EF5;
+  --color-accent-ink: #5142e0;
+
+  /* Warm-tinted neutrals (not pure gray). */
+  --color-bg: #faf9fb;
+  --color-surface: #ffffff;
+  --color-ink: #1a1825;
+  --color-ink-soft: #6b6478;
+  --color-line: #e7e4ed;
+
+  /* Semantic -- kept separate from the accent hue on purpose. */
+  --color-success: #16a34a;
+  --color-success-bg: #e9f7ef;
+  --color-warning: #d97706;
+  --color-warning-bg: #fdf1e0;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fbe9e9;
+  --color-info: #2563eb;
+  --color-info-bg: #e7eefd;
+
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --animate-fade-in: fade-in 0.4s ease-out;
+  --animate-slide-up: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+.dark {
+  --color-accent: #8b7fff;
+  --color-accent-ink: #a79cff;
+
+  --color-bg: #0f0e13;
+  --color-surface: #17161c;
+  --color-ink: #e8e6ef;
+  --color-ink-soft: #9a93ac;
+  --color-line: #2a2733;
+
+  --color-success: #4ade80;
+  --color-success-bg: #163524;
+  --color-warning: #f5a524;
+  --color-warning-bg: #3a2a10;
+  --color-danger: #f87171;
+  --color-danger-bg: #3a1e1e;
+  --color-info: #60a5fa;
+  --color-info-bg: #17263f;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background-color: color-mix(in srgb, var(--color-surface) 70%, transparent);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-line);
+  }
+}
