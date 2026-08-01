@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<html>
+  {% load static %}
+  <head>
+    <title>Bluepark Restaurant | Login</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+  </head>
+  <body>
+    <header>
+      <div class="restitle">
+        <h1>BluePark</h1>
+      </div>
+    </header>
+      <div class="loginbox">
+        <img src="{% static 'images/p2.jpg'%}" class="avatar">
+          <h1>Login Here</h1>
+          <form method="POST">
+              {% csrf_token %}
+              <p>Username</p>
+              <input type="text" id="uname" name="uname" placeholder="Enter Username" required>
+              <p>Password</p>
+              <input type="password" name="pwd" placeholder="Enter Password" required>
+              <input type="submit" value="Login">
+              <a href="{% url 'update' %}">Update Password</a><br>
+              <a href="{% url 'register' %}">Don't have an Account- SIGN UP</a><br>
+              <a href="{% url 'admin:index' %}">Admin Login</a>
+          </form>
+          <div class="message">
+            {% for message in messages %}
+					  <h3 id="messages" style="text-align:center;">{{message}}</h3>
+				    {% endfor %}
+          </div>
+      </div>
+  </body>
+</html>

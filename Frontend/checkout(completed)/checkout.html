@@ -1,0 +1,150 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="checkout.css">
+        <!-- <script type="text/javascript" src="js/checkout.js"></script>-->
+    </head>
+    <body>
+<div class="row">
+  <div class="col-75">
+    <div class="container">
+      <form action="" method="post" onsubmit="return validate()">
+          <script>
+            function validate(){
+                var uname = document.getElementById('cname');
+                var letters = /^[A-Za-z]+$/;
+                if(cname.value.trim()==""||!cname.value.match(letters))
+                {
+                    alert("Please Enter valid name!");
+                    return false;
+                }
+                if(document.getElementById('ccnum').value.length<16||document.getElementById('ccnum').value.length>16)
+                {
+                    alert("Length of your card number should be 16!!!");
+                    return false;
+                }
+                if(document.getElementById('expmonth').value<1||document.getElementById('expmonth').value>12)
+                {
+                    alert("please enter valid month!!");
+                    return false;
+                }
+                if(document.getElementById('expyear').value.length<4||document.getElementById('expyear').value.length>4||document.getElementById('expyear').value<2021)
+                {
+                    alert("please enter valid year!!");
+                    return false;
+                }
+                
+                if(document.getElementById('cvv').value.length<3||document.getElementById('cvv').value.length>3) 
+                {
+                    alert("please enter valid cvv!!");
+                    return false;
+                }
+}
+
+
+          </script>
+        <div class="row">
+          <div class="col-50">
+            <h3>Delivery Address</h3>
+            <label for="fname"><i class="fa fa-user"></i> Full Name</label>
+            <input type="text" id="fname" name="firstname" placeholder="Enter Full Name" required>
+            <label for="adr"><i class="fa fa-address-card-o"></i> Address</label>
+            <input type="text" id="adr" name="address" placeholder="Enter Address" required>
+            <label for="city"><i class="fa fa-institution"></i> City</label>
+            <input type="text" id="city" name="city" placeholder="Vizag" disabled>
+
+            <div class="row">
+              <div class="col-50">
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" placeholder="Andhra Pradesh" disabled>
+              </div>
+              <div class="col-50">
+                <label for="zip">Pincode</label>
+                <input type="text" id="zip" name="zip" placeholder="Enter Pincode" required>
+              </div>
+                <div class="col-50">
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="Enter Phone number" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-50">
+            <h3>Payment</h3>
+            <label for="fname">Accepted Cards</label>
+            <div class="icon-container">
+              <i class="fa fa-cc-visa" style="color:navy;"></i>
+              <i class="fa fa-cc-amex" style="color:blue;"></i>
+              <i class="fa fa-cc-mastercard" style="color:red;"></i>
+              <i class="fa fa-cc-discover" style="color:orange;"></i>
+            </div>
+            <label for="cname">Name on Card</label>
+            <input type="text" id="cname" name="cardname" placeholder="Enter your Card Name">
+            <label for="ccnum">Credit card number</label>
+            <input type="text" id="ccnum" name="cardnumber" placeholder="Enter Your Card Number">
+            <label for="expmonth">Expiry Month</label>
+            <input type="text" id="expmonth" name="expmonth" placeholder="Enter Card Expiry Month ">
+
+            <div class="row">
+              <div class="col-50">
+                <label for="expyear">Expiry Year</label>
+                <input type="text" id="expyear" name="expyear" placeholder="Enter Card Expiry Year">
+              </div>
+              <div class="col-50">
+                <label for="cvv">CVV</label>
+                <input type="password" id="cvv" name="cvv" placeholder="Enter Your CVV">
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <label>
+          <input type="checkbox" name="cod" id="cod" onclick="paymentDisable()"> Cash On Delivery
+        </label>
+          <script type="text/javascript">
+            
+function paymentDisable()
+{
+	var cod = document.getElementById("cod");
+	if(cod.checked==true){
+		document.getElementById("cname").disabled = true;
+        document.getElementById("ccnum").disabled = true;
+        document.getElementById("expmonth").disabled = true;
+        document.getElementById("expyear").disabled = true;
+        document.getElementById("cvv").disabled = true;
+	}
+    else{
+        document.getElementById("cname").disabled = false;
+        document.getElementById("ccnum").disabled = false;
+        document.getElementById("expmonth").disabled = false;
+        document.getElementById("expyear").disabled = false;
+        document.getElementById("cvv").disabled = false;
+    }
+}
+          </script>
+          
+        <input type="submit" value="Continue to checkout" class="btn" >
+      </form>
+    </div>
+  </div>
+
+  <div class="col-25">
+    <div class="container">
+      <h4>Cart&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Qty
+        <span class="price" style="color:black">
+          <i class="fa fa-shopping-cart"></i>
+          <b>4</b>
+        </span>
+      </h4>
+      <p><a href="#">Product 1</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">1</span> <span class="price">15Rs.</span></p>
+      <p><a href="#">Product 2</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">2</span> <span class="price">5Rs.</span></p>
+      <p><a href="#">Product 3</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="qty">1</span> <span class="price">8Rs.</span></p>
+     
+      <hr>
+      <p>Total <span class="price" style="color:black"><b>30rs</b></span></p>
+    </div>
+  </div>
+</div>
+    </body>
+</html>

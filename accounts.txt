@@ -1,0 +1,100 @@
+<!-- Update.html -->
+<!DOCTYPE html>
+<html lang="en-US">
+<html>
+  <head>
+    <title>Bluepark Restaurant | Update Password</title>
+      <link rel="stylesheet" type="text/css" href="css/register.css">
+      <script type="text/javascript" src="js/register.js"></script>
+    </head>
+  <body>
+      <div class="loginbox">
+        <img src="images/p2.jpg" class="avatar">
+        <h1>Update Password</h1>
+        <form method="post" onsubmit="return validate()">
+          <p>Username</p>
+          <input type="text" id="uname" name="uname" placeholder="Enter username" required>
+          <p>Current Password</p>
+          <input type="password" id="password" name="password" placeholder="Enter current password" required>
+          <p>New Password</p>
+          <input type="password" id="pwd" name="pwd" placeholder="Enter new password" required>
+          <p>Confirm New Password</p>
+          <input type="password" id="pwd1" name="pwd1" placeholder="Enter New password again" required>
+          <input type="submit" name="update" value="Update Password">
+        </form>
+        <button type="button" name="backlogin"><a href="login.html">Back to Login</a></button>
+        <div class="message">
+        </div>
+      </div>
+  </body>
+</html>
+
+
+<!-- Login.html -->
+<!DOCTYPE html>
+<html lang="en-US">
+<html>
+  <head>
+    <title>Bluepark Restaurant | Login</title>
+    <link rel="stylesheet" type="text/css" href="css/login.css">
+  </head>
+  <body>
+      <div class="loginbox">
+        <img src="images/p2.jpg" class="avatar">
+          <h1>Login Here</h1>
+          <form method="POST">
+              <p>Username</p>
+              <input type="text" id="uname" name="uname" placeholder="Enter Username" required>
+              <p>Password</p>
+              <input type="password" name="pwd" placeholder="Enter Password" required>
+              <input type="submit" value="Login">
+              <a href="update.html">Update Password</a><br>
+              <a href="register.html">Don't have an Account- SIGN UP</a><br>
+              <a href="#">Admin Login</a>
+          </form>
+          <div class="message">
+          </div>
+      </div>
+  </body>
+</html>
+
+<!--Register.html-->
+
+<!DOCTYPE html>
+<html lang="en-US">
+<html>
+  <head>
+    <title>Bluepark Restaurant | Register</title>
+      <link rel="stylesheet" type="text/css" href="css/register.css">
+      <script type="text/javascript" src="js/register.js"></script>
+    </head>
+    <body>
+      <div class="loginbox">
+        <img src="images/p2.jpg" class="avatar">
+        <h1>Register</h1>
+        <form method="post" onsubmit="return validate()">
+            <p>Username</p>
+            <input type="text" id="uname" name="uname" placeholder="Enter new username" required>
+            <p>Email</p>
+            <input type="mail" id="mail" name="mail" placeholder="Enter your mail id" required>
+            <p>New Password</p>
+            <input type="password" id="pwd" name="pwd" placeholder="Enter password" required>
+            <p>Confirm Password</p>
+            <input type="password" id="pwd1" name="pwd1" placeholder="Confirm password" required>
+            <input type="submit" name="register" value="register">
+          </form>
+          <button type="button" name="backlogin"><a href="login.html">Back to Login</a></button>
+          <div class="message">
+          </div>
+        </div>
+    </body>
+</html>
+
+
+<!-- Checkout Mobile phone Addition -->
+<div class="row">
+    <div class="col-50">
+        <label for="phone">Mobile</label>
+            <input type="tel" id="phone" name="phone" pattern="pattern="[0-9]{10}" placeholder="Enter your Phone number" required>
+    </div>
+</div>

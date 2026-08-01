@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+Backend/bluepark/db.sqlite3
+Backend/bluepark/staticfiles/
+
+# Environment
+.env
+*.env.local
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

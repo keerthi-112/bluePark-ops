@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Website Survey Form</title>
+    <link rel="stylesheet" href="surveyForm.css">
+  </head>
+  <body>
+    <script src="surveyValidate.js"></script>
+    <div class="whole">
+      <div class="header">
+        <a href="https://tinyurl.com/4k78r2p5" target="_blank">www.foodOrders.com</a>
+        <h1>Website Survey Form</h1>
+        <p>Thank you for using our Website :)<br>
+        Kindly fill up this survey, this will just take 3 minutes of your time.<br>
+        This survey will help us to provide you much better optimized services.</p>
+      </div>
+      <div class="footer">
+        <form name="survey" action="http://help.formstack.com/hc/article_attachments/360015218271/image-1.jpeg" method="get" onsubmit="return validate()">
+          <div class="formdiv">
+            <br>
+            Have you ever heard of this website before?<br><br>
+              <div class="radio11">
+                <input type="radio" name="heard" id="yes" value="yes">
+                <label for="yes">Yes</label>
+              </div>
+              <div class="radio12">
+                <input type="radio" name="heard" id="no" value="no">
+                <label for="no">No</label>
+              </div>
+
+            <br><br>
+            Where did you came to know about this website?
+            <select name="platforms">
+                <option value="Newspaper">Newspaper</option>
+                <option value="Ads">Advertisements</option>
+                <option value="sms">SMS</option>
+                <option value="friends">Friends</option>
+                <option value="osource" selected="selected">Other source</option>
+            </select>
+            <br><br>
+            What is your name?<br>
+            <input type="text" name="username" id="username" placeholder="Enter your name">
+            <br><br>
+            <!--
+            What is your Date of Birth(DOB)?
+            <br><br>
+            <input type="date" id="dob" required>
+            -->
+            What is your age?
+            <br>
+            <input type="number" id="age" name="age" placeholder="Age in years" min="16" max="110" required>
+            <br><br>
+            Have you purchased anything in our website?
+            <br><br>
+
+            <div class="radio21">
+              <input type="radio" name="purchase" id="yes2" value="yes"><label for="yes2">Yes</label>
+            </div>
+            <div class="radio22">
+              <input type="radio" name="purchase" id="no2" value="no"><label for="no2">No</label>
+            </div>
+            <br><br>
+            What kind of food items you loved most from our website?
+            <br><br>
+            <div class="itemlist">
+              <input type="checkbox" name="items" id="item1" value="item1">
+              <label for="item1">Indian Traditional food</label>
+              <input type="checkbox" name="items" id="item2" value="item2">
+              <label for="item2">German food</label>
+              
+              <input type="checkbox" name="items" id="item3" value="item3">
+              <label for="item3">Continental food</label>
+
+              <input type="checkbox" name="items" id="item4" value="item4">
+              <label for="item4">Arabian food</label>
+
+              <input type="checkbox" name="items" id="item5" value="item5">
+              <label for="item5">Mexican food</label>
+
+              <input type="checkbox" name="items" id="item6" value="item6">
+              <label for="item6">Italian food</label>
+
+              <input type="checkbox" name="items" id="item7" value="item7">
+              <label for="item7">Bakery  items</label>
+
+              <input type="checkbox" name="items" id="item8" value="item8">
+              <label for="item8">other items</label>
+
+            </div>
+            <br><br><br>
+            Enter your Mail-id to receive exciting promotional offers<br>
+            <input type="mail" name="email" id="email" placeholder="Enter your E-mail address">
+            <br><br>
+            How much do you rate for our website on a scale(0-5)?
+            <br>
+            <input type="range" id="rating" class="slider" min="0" max="5" value="0">
+            <p id="colorchange">Rating: <span id="disprange"></span></p>
+            <br><br>
+            <script>
+              var slider = document.getElementById('rating');
+              var display = document.getElementById('disprange');
+              display.innerHTML = slider.value;
+              x=document.getElementById('colorchange');
+              x.style.color="red";
+              slider.oninput = function(){
+                display.innerHTML = this.value;
+                if(this.value=="0"||this.value=="1"){
+                  x.style.color="#ed1515";
+                }
+                else if(this.value=="2"||this.value=="3"){
+                  x.style.color="orange";
+                }
+                else if(this.value=="4"||this.value=="5"){
+                  x.style.color="#00cc44";
+                }
+              }
+
+            </script>
+            Please write your feedback on our services <br><br>
+            <textarea maxlength="150" id="feedback" rows="10" cols="100" placeholder="Maximum limit:150 characters"></textarea>
+            <br><br>
+            <input id="reset" type="reset" name="reset">
+            <input id="submit" type="submit" name="submit">
+            <br><br>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

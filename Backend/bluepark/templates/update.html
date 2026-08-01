@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<html>
+  {% load static %}
+  <head>
+    <title>Bluepark Restaurant | Update Password</title>
+      <link rel="stylesheet" type="text/css" href="{% static 'css/register.css' %}">
+      <script type="text/javascript" src="{% static 'js/register.js' %}"></script>
+    </head>
+  <body>
+    <header>
+      <div class="restitle">
+        <h1>BluePark</h1>
+      </div>
+    </header>
+      <div class="loginbox">
+        <img src="{% static 'images/p2.jpg' %}" class="avatar">
+        <h1>Update Password</h1>
+        <form method="post" onsubmit="return validate()">
+          {% csrf_token %}
+          <p>Username</p>
+          <input type="text" id="uname" name="uname" placeholder="Enter username" required>
+          <p>Current Password</p>
+          <input type="password" id="password" name="password" placeholder="Enter current password" required>
+          <p>New Password</p>
+          <input type="password" id="pwd" name="pwd" placeholder="Enter new password" required>
+          <p>Confirm New Password</p>
+          <input type="password" id="pwd1" name="pwd1" placeholder="Enter New password again" required>
+          <input type="submit" name="update" value="Update Password">
+        </form>
+        <button type="button" class="backlogin"><a href="{% url 'login'%}">Back to Login</a></button>
+        <div class="message">
+          {% for message in messages %}
+          <h3 id="messages" style="text-align:center;">{{message}}</h3>
+          {% endfor %}
+        </div>
+      </div>
+  </body>
+</html>

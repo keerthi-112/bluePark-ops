@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food ordering system</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/homepage.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    {% block stylesheet %} {% endblock stylesheet %}
+    <!--<script type="text/javascript" src="{% static 'js/cartpage.js' %}" async></script>-->
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
+    {% block javascript %}{% endblock javascript %}
+</head>
+<body>
+    <section class="header">
+        <nav class="navbar">
+            <div class="navbar-box">
+                <h3 class="heading-tertiary"><span id="blue">Blue</span> Park restaurant</h3>
+            </div>
+
+            <ul class="navbar-list">
+                <!--
+                <li class="navbar-item">
+                    <a href="#menucall" class="navbar-link-book">Order now</a>
+                </li>
+                -->
+                <li class="navbar-item">
+                    <a href="#cartspan" class="navbar-link-book1"><i class="fa fa-shopping-cart" >Cart</i></a>
+                </li>
+                <li class="navbar-item">
+                    <a href="{% url 'survey' %}" class="navbar-link-book1">Feedback</a>
+                </li>
+                {% if user.is_authenticated %}
+                
+                <li class="navbar-item">
+                    <span style="color: white;">Hi, {{user.username}}</span>
+                    <a href="{% url 'logout' %}" class="navbar-link-book1">Logout</a>
+                </li>
+                {% else %}
+                <li class="navbar-item">
+                    <a href="{% url 'register' %}" class="navbar-link-book1">Register</a>
+                </li>
+                <li class="navbar-item">
+                    <a href="{% url 'login' %}" class="navbar-link-book1">Login</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        <div class="header-container">
+            <div class="video">
+                <video loop muted autoplay id="video">
+                    <source src="{% static 'images/video.mp4' %}" type="video/mp4">
+                </video>
+            </div>
+            <div class="header-box">
+                <h1 class="heading-primary">
+                    Best <br> <span id="restaurant">Restaurant</span> <br> in Vizag
+                </h1>
+                <a href="#menucall" class="book-now">Order Now</a>
+            </div>
+        </div>
+    </section>
+    <span id="menucall"></span>
+    <section class="menu" id="menu">
+        <script type="text/javascript" src="{% static 'js/theme.js' %}"></script>
+        <button id="mode" onclick="changeTheme()">Light Mode</button>
+        
+        <div class="container">
+            <div class="menu-heading" id="menu-heading">Menu</div>
+            </div>
+            <h1 class="menu-mid" id="menu-mid">Recommended Items:</h1>
+            <br>
+            <br>
+            {% block content %}
+            <div class="menu-grid">
+                {% for menus in menu_items %}
+                    {% if menus.category == "recommended" %}
+                    <div class="menu-container">
+                        <img class="menu-img imgs" src="{{menus.menuimg.url}}">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">{{menus.item_name}}</h1>
+                        <p class="menu-p">{{menus.description}}</p>
+                        <h3 class="price">{{menus.price}}</h3>₹
+                    </div>
+                    {% endif %}
+                {% endfor %}         
+            </div>
+            <br>
+            <br>
+            <br>
+                <h1 class="menu-mid" id="menu-mid">Starter:</h1>
+                <br>
+                <br>
+                <div class="menu-grid1">
+                {% for menus in menu_items %}
+                    {% if menus.category == "starters" %}
+                    <div class="menu-container">
+                        <img class="menu-img imgs" src="{{menus.menuimg.url}}">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">{{menus.item_name}}</h1>
+                        <p class="menu-p">{{menus.description}}</p>
+                        <h3 class="price">{{menus.price}}</h3>₹
+                    </div>
+                    {% endif %}
+                {% endfor %}          
+               </div>
+               <br>
+               <br>
+        <h1 class="menu-mid" id="menu-mid">Biryani:</h1>
+        <br>
+        <div class="menu-grid1">
+        {% for menus in menu_items %}
+            {% if menus.category == "biriyanis" %}
+            <div class="menu-container">
+                <img class="menu-img imgs" src="{{menus.menuimg.url}}">
+                <button type="button" class="check">Add to Cart</button>
+                <h1 class="menu-title">{{menus.item_name}}</h1>
+                <p class="menu-p">{{menus.description}}</p>
+                <h3 class="price">{{menus.price}}</h3>₹
+            </div>
+            {% endif %}
+        {% endfor %}    
+        </div>
+        <span id="cartspan"></span> 
+        {% endblock %}
+        
+        <br>
+        <br>
+        {% if user.is_authenticated %}
+        <p id="login" hidden="True">1</p>
+        {% else %}
+        <p id="login" hidden="True">0</p>
+        {% endif %}
+      <h1 class="menu-heading" id="menu-heading">Cart</h1>
+      <div class="display-cart">
+          <script type="text/javascript">
+            if (document.readyState == 'loading') {
+                document.addEventListener('DOMContentLoaded', ready)
+            } else {
+                ready()
+            }
+            
+            function ready() {
+                var removeCartItemButtons = document.getElementsByClassName('fa-trash')
+                for (var i = 0; i < removeCartItemButtons.length; i++) {
+                    var button = removeCartItemButtons[i]
+                    button.addEventListener('click', removeCartItem)
+                }
+            
+                var quantityInputs = document.getElementsByClassName('cart-quantity-input')
+                for (var i = 0; i < quantityInputs.length; i++) {
+                    var input = quantityInputs[i]
+                    input.addEventListener('change', quantityChanged)
+                }
+            
+                var addToCartButtons = document.getElementsByClassName('check')
+                for (var i = 0; i < addToCartButtons.length; i++) {
+                    var button = addToCartButtons[i]
+                    button.addEventListener('click', addToCartClicked)
+                }
+            
+                document.getElementsByClassName('btn-order')[0].addEventListener('click', purchaseClicked)
+            }
+            
+            function purchaseClicked() {
+                var cartItems = document.getElementsByClassName('cart-items')[0]
+                while (cartItems.hasChildNodes()) {
+                    cartItems.removeChild(cartItems.firstChild)
+                }
+                updateCartTotal()
+            }
+            
+            function removeCartItem(event) {
+                var buttonClicked = event.target
+                buttonClicked.parentElement.parentElement.remove()
+                updateCartTotal()
+            }
+            
+            function quantityChanged(event) {
+                var input = event.target
+                if (isNaN(input.value) || input.value <= 0) {
+                    input.value = 1
+                }
+                updateCartTotal()
+            }
+            
+            function addToCartClicked(event) {
+                var button = event.target
+                var menuItem = button.parentElement
+                var title = menuItem.getElementsByClassName('menu-title')[0].innerText
+                var price = menuItem.getElementsByClassName('price')[0].innerText
+                var imageSrc = menuItem.getElementsByClassName('imgs')[0].src
+                addItemToCart(title, price)
+                updateCartTotal()
+            }
+            
+            function addItemToCart(title, price) {
+                var count = 0
+                var login = document.getElementById('login').innerText
+                console.log(login)
+                var cartRow = document.createElement('tr')
+                cartRow.classList.add('cart-row')
+                var cartItems = document.getElementsByClassName('cart-items')[0]
+                var cartItemNames = cartItems.getElementsByClassName('cart-item-title')
+                for (var i = 0; i < cartItemNames.length; i++) {
+                    count = count + 1;
+                    if (cartItemNames[i].innerText == title) {
+                        alert('This item is already added to the cart')
+                        return
+                    }
+                    else{
+                            $.ajax({
+                                url: '{% url "cart_add" %}',
+                                data: {
+                                    'login': login,
+                                    'title': title,
+                                    'price': price,
+                                    'count': (count>=1)?1:0
+                                },
+                                dataType: 'json',
+                                success: function (data) {
+                                    if (data) {
+                                        
+                                    }
+                                }
+                            });
+                        }
+                    }
+                
+                var cartRowContents = `
+                    <td class="cart-item-title">${title}</td>
+                    <td class="cart-quantity">
+                        <input class="cart-quantity-input" type="number" value="1" max="6">  
+                    </td>
+                    <td>
+                      <span class="cart-note"><input type="text" class="txt1"></span>
+                      <i class="fa fa-trash fa-2x"></i>
+                    </td>
+                    <td class="cart-price cart-column">${price}
+                    </td>
+                    `
+            
+                cartRow.innerHTML = cartRowContents
+                cartItems.append(cartRow)
+                cartRow.getElementsByClassName('fa-trash')[0].addEventListener('click', removeCartItem)
+                cartRow.getElementsByClassName('cart-quantity-input')[0].addEventListener('change', quantityChanged)
+            
+            }
+            
+            function updateCartTotal() {
+                var cartItemContainer = document.getElementsByClassName('cart-items')[0]
+                var cartRows = cartItemContainer.getElementsByClassName('cart-row')
+                var total = 0
+                for (var i = 0; i < cartRows.length; i++) {
+                    var cartRow = cartRows[i]
+                    var priceElement = cartRow.getElementsByClassName('cart-price')[0]
+                    var quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0]
+                    var price = parseFloat(priceElement.innerText.replace('$', ''))
+                    var quantity = quantityElement.value
+                    total = total + (price * quantity)
+                }
+                total = Math.round(total * 100) / 100
+                document.getElementsByClassName('cart-total-price')[0].innerText = total+'₹'
+            }
+            
+            
+          </script>
+        <table id="cart-table" class="cart-items">
+          <tr>
+            <th>ITEM</th>
+            <th>QUANTITY</th>
+            <th>NOTE</th>
+            <th>PRICE</th>
+          </tr>
+        </table>
+        <div class="cart-total">
+          <strong class="cart-total-title">Total:&nbsp;</strong>
+          <span class="cart-total-price">0₹</span>
+        </div>
+      </div>
+        <!--Don't forget to change the path of hyperlinks-->
+        {% if user.is_authenticated %}
+        <a href="{% url 'checkout' %}"><button class="btn-order" type="button">Continue To Checkout</button></a>
+        {% else %}
+        <a href="{% url 'login'%}"><button class="btn-order" type="button">Continue To Checkout</button></a>
+        {% endif %}
+    </section>
+    <footer>
+        <div class="footer">
+            <div class="footer-content">
+  
+                <div class="footer-section about">
+                    <h1 class="logo-text"><span>Blue</span>Park</h1>
+                    <p>
+                        Launched in Vizag, BluePark has grown from a home project to one of the largest food aggregators in the Vizag.
+                        We are enabling our vision of better food for more people. We not only connect people to food in every context but work closely with restaurants to enable a sustainable ecosystem.
+                    </p>
+                </div>
+                <div class="footer-section links">
+                    <div class="div2">
+                        <h2>Quick Links</h2>
+                    <br>
+                    <ul>
+                    <a href="#"><li>Events</li></a>
+                    <a href="#"><li>Team</li></a>
+                    <a href="#"><li>Mentors</li></a>
+                    <a href="#"><li>Gallery</li></a>
+                    <a href="#"><li>Terms and conditions</li></a>
+                    </ul>
+                    </div>
+                </div>
+                 <div class="footer-section contact-form">
+                     <h2>Contact Us</h2>
+                     <br>
+                     <div class="contact">
+                        <span>9666765999</span><br>
+                        <span>info@Bluepark.com</span><br>
+                        <br>
+                        <h2>Follow Us on</h2>
+                        <br>
+                         <a href="#" class="fa fa-facebook"></a>
+                         <a href="#" class="fa fa-twitter"></a>
+                         <a href="#" class="fa fa-youtube"></a>
+                         <a href="#" class="fa fa-instagram"></a>
+                         <a href="#" class="fa fa-google"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom" style="font-size: large;">
+            &copy; bluerestuarant.com |Designed by B18 members
+                </div>
+        </div>
+      </footer>
+    </body>
+    
+</html>

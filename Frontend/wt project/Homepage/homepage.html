@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food ordering system</title>
+    <link rel="stylesheet" type="text/css" href="homepage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="cartpage.js" async></script>
+</head>
+<body>
+    <section class="header">
+        <nav class="navbar">
+            <div class="navbar-box">
+                <h3 class="heading-tertiary">Blue Park restaurant</h3>
+            </div>
+
+            <ul class="navbar-list">
+                <li class="navbar-item">
+                    <!--Don't forget to change the path of hyperlinks-->
+                    <a href="C:\Users\bunny\Documents\wt project\accounts\login.html" target="_blank" class="navbar-link-book1">Login</a>
+                </li>
+                <li class="navbar-item">
+                    <a href="C:\Users\bunny\Documents\wt project\accounts\register.html" target="_blank" class="navbar-link-book1">Register</a>
+                </li>
+                <li class="navbar-item">
+                    <a href="C:\Users\bunny\Documents\wt project\survey _ feedback form\surveyForm.html"target="_blank" class="navbar-link-book1">Feedback</a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#menucall" class="navbar-link-book">Order now</a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#carttp" class="navbar-link-book1"><i class="fa fa-shopping-cart" >Cart</i></a>
+                </li>
+            </ul>
+        </nav>
+        <div class="header-container">
+            <div class="video">
+                <video loop muted autoplay id="video">
+                    <source src="img/video.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="header-box">
+                <h1 class="heading-primary">
+                    Best <br> <span id="restaurant">Restaurant</span> <br> in Vizag
+                </h1>
+                <a href="#menucall" class="book-now">Order Now</a>
+            </div>
+        </div>
+    </section>
+    <span id="menucall"></span>
+    <section class="menu">
+        <div class="container">
+            <div class="menu-heading">Menu</div>
+            </div>
+            <h1 class="menu-mid">Recommended Items:</h1>
+            <br>
+            <br>
+            <div class="menu-grid">
+                    <div class="menu-container">
+                         <img class="menu-img imgs" src="img\1.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Chicken Tandoori</h1>
+                        <p class="menu-p">Mixed with Spices and burnt perfectly</p>
+                        <h3 class="price">300₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img1 imgs" src="img\2.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Chicken Tikka</h1>
+                        <p class="menu-p">Best North indian spicy dish </p>
+                        <h3 class="price">200₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img2 imgs" src="img\3.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Paneer tikka</h1>
+                        <p class="menu-p">One of the best delicious veg dishes</p>
+                        <h3 class="price">150₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img3 imgs" src="img\4.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Chilli Paneer</h1>
+                        <p class="menu-p">Made with several spices to enhance the spiciness</p>
+                        <h3 class="price">175₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img4 imgs" src="img\5.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Chicken Biriyani</h1>
+                        <p class="menu-p">Spicy Chicken biriyani Cooked with the best rice</p>
+                        <h3 class="price">300₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img5 imgs" src="img\6.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Paneer Biriyani</h1>
+                        <p class="menu-p">Spicy Paneer biriyani Cooked with the best rice</p>
+                        <h3 class="price">250₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img6 imgs" src="img\7.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Egg biryani</h1>
+                        <p class="menu-p">Best spicy egg biriyani you will ever taste </p>
+                        <h3 class="price">275₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img7 imgs" src="img\8.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Veg biriyani</h1>
+                        <p class="menu-p">Best pulao you will ever have from our hotel</p>
+                        <h3 class="price">150₹</h3>
+                    </div>
+            </div>
+            <br>
+            <br>
+            <br>
+                <h1 class="menu-mid">Starter:</h1>
+                <br>
+                <br>
+                <div class="menu-grid1">
+                        <div class="menu-container">
+                            <img class="menu-img imgs" src="img\1.jpg">
+                            <button type="button" class="check">Add to Cart</button>
+                            <h1 class="menu-title">Chicken Tandoori</h1>
+                            <p class="menu-p">Mixed with Spices and burnt perfectly</p>
+                            <h3 class="price">300₹</h3>
+                        </div>
+                        <div class="menu-container">
+                            <img class="menu-img1 imgs" src="img\2.jpg">
+                            <button type="button" class="check">Add to Cart</button>
+                            <h1 class="menu-title">Chicken Tikka</h1>
+                            <p class="menu-p">Best North indian spicy dish </p>
+                            <h3 class="price">200₹</h3>
+                        </div>
+                        <div class="menu-container">
+                            <img class="menu-img2 imgs" src="img\3.jpg">
+                            <button type="button" class="check">Add to Cart</button>
+                            <h1 class="menu-title">Paneer tikka</h1>
+                            <p class="menu-p">One of the best delicious veg dishes</p>
+                            <h3 class="price">150₹</h3>
+                        </div>
+                        <div class="menu-container">
+                            <img class="menu-img3 imgs" src="img\4.jpg">
+                            <button type="button" class="check">Add to Cart</button>
+                            <h1 class="menu-title">Chilli Paneer</h1>
+                            <p class="menu-p">Made with several spices to enhance the spiciness</p>
+                            <h3 class="price">175₹</h3>
+                        </div>
+               </div>
+               <br>
+               <br>
+        <h1 class="menu-mid">Biryani:</h1>
+        <br>
+        <div class="menu-grid1">
+                    <div class="menu-container">
+                        <img class="menu-img4 imgs" src="img\5.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Chicken Biriyani</h1>
+                        <p class="menu-p">Spicy Chicken biriyani Cooked with the best rice</p>
+                        <h3 class="price">300₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img5 imgs" src="img\6.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Paneer Biriyani</h1>
+                        <p class="menu-p">Spicy Paneer biriyani Cooked with the best rice</p>
+                        <h3 class="price">250₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img6 imgs" src="img\7.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Egg biryani</h1>
+                        <p class="menu-p">Best spicy egg biriyani you will ever taste </p>
+                        <h3 class="price">275₹</h3>
+                    </div>
+                    <div class="menu-container">
+                        <img class="menu-img7 imgs" src="img\8.jpg">
+                        <button type="button" class="check">Add to Cart</button>
+                        <h1 class="menu-title">Veg biriyani</h1>
+                        <p class="menu-p">Best pulao you will ever have from our hotel</p>
+                        <h3 class="price">150₹</h3>
+                        <span id="carttp"></span>
+                    </div>
+              </div>
+
+        <br>
+        <br>
+
+      <h1 class="menu-heading">Cart</h1>
+      <div class="shopping-cart">
+
+        <table class="cart-items">
+          <tr>
+            <th>ITEM</th>
+            <th>QUANTITY</th>
+            <th>NOTE</th>
+            <th>PRICE</th>
+          </tr>
+        </table>
+        <div class="cart-total">
+          <strong class="cart-total-title">Total:&nbsp;</strong>
+          <span class="cart-total-price">0₹</span>
+        </div>
+      </div>
+        <!--Don't forget to change the path of hyperlinks-->
+      <a href="C:\Users\bunny\Documents\wt project\checkout\checkout.html" target="_blank"><button class="btn-order" type="button">Continue To Checkout</button></a>
+    </section>
+    </body>
+    <footer>
+      <div class="footer">
+          <div class="footer-content">
+
+              <div class="footer-section about">
+                  <h1 class="logo-text"><span>Blue</span>Park</h1>
+                  <p>
+                      Launched in Vizag, BluePark has grown from a home project to one of the largest food aggregators in the Vizag.
+                      We are enabling our vision of better food for more people. We not only connect people to food in every context but work closely with restaurants to enable a sustainable ecosystem.
+                  </p>
+              </div>
+              <div class="footer-section links">
+                  <div class="div2">
+                      <h2>Quick Links</h2>
+                  <br>
+                  <ul>
+                  <a href="#"><li>Events</li></a>
+                  <a href="#"><li>Team</li></a>
+                  <a href="#"><li>Mentors</li></a>
+                  <a href="#"><li>Gallery</li></a>
+                  <a href="#"><li>Terms and conditions</li></a>
+                  </ul>
+                  </div>
+              </div>
+               <div class="footer-section contact-form">
+                   <h2>Contact Us</h2>
+                   <br>
+                   <div class="contact">
+                      <span>9666765999</span><br>
+                      <span>info@Bluepark.com</span><br>
+                       <a href="#" class="fa fa-facebook"></a>
+                       <a href="#" class="fa fa-twitter"></a>
+                       <a href="#" class="fa fa-youtube"></a>
+                       <a href="#" class="fa fa-instagram"></a>
+                       <a href="#" class="fa fa-google"></a>
+                  </div>
+              </div>
+          </div>
+          <div class="footer-bottom">
+          &copy; bluerestuarant.com |Designed by B18 members
+              </div>
+      </div>
+    </footer>
+</html>

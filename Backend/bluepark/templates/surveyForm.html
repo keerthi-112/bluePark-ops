@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  {% load static %}
+  <head>
+    <title>Website Survey Form</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    {% block javascript %}{% endblock javascript%}
+    <link rel="stylesheet" href="{% static 'css/surveyForm.css' %}">
+  </head>
+  <body>
+    <script src="{% static 'js/surveyValidate.js' %}"></script>
+    <div class="whole">
+      <div class="header">
+        <a href="{% url 'login' %}" target="_blank">www.Bluepark.com</a>
+        <h1>Website Survey Form</h1>
+        <p>Thank you for using our Website :)<br>
+        Kindly fill up this survey, this will just take 3 minutes of your time.<br>
+        This survey will help us to provide you much better optimized services.</p>
+      </div>
+      <div class="surveyForm">
+        <form name="survey" action="" method="POST" onsubmit="return validate()">
+          {% csrf_token %}
+          <div class="formdiv">
+            <p>Have you ever heard of our Restaurant before?</p>
+              <div class="radio11">
+                <input type="radio" name="heard" id="yes" value="yes">
+                <label for="yes">Yes</label>
+              </div>
+              <div class="radio12">
+                <input type="radio" name="heard" id="no" value="no">
+                <label for="no">No</label>
+              </div>
+            <br><br>
+            <p>Where did you came to know about our Restaurant?</p>
+            <select name="platforms">
+                <option value="Newspaper">Newspaper</option>
+                <option value="Ads">Advertisements</option>
+                <option value="sms">SMS</option>
+                <option value="friends">Friends</option>
+                <option value="osource" selected="selected">Other source</option>
+            </select>
+            <p>What is your name?</p>
+            <input type="text" name="username" id="username" placeholder="Enter your name">
+            <br>
+            <p>Have you ordered anything in our website?</p>
+            <div class="radio21">
+              <input type="radio" name="purchase" id="yes2" value="True"><label for="yes2">Yes</label>
+            </div>
+            <div class="radio22">
+              <input type="radio" name="purchase" id="no2" value="False"><label for="no2">No</label>
+            </div>
+            <br><br>
+            <p>What are your favourite food items in our Restaurant?</p>
+            <input type="text" name="favourite" id="favourite" placeholder="Enter your favourite food items">
+            <br><br>
+            <p>Enter your Mail-id to receive exciting promotional offers</p>
+            <input type="mail" name="email" id="email" placeholder="Enter your E-mail address">
+            <br><br>
+            <p>How much do you rate for our website on a scale(0-5)?</p>
+            <br>
+            <input type="range" name="rating" id="rating" class="slider" min="0" max="5" value="0">
+            <p id="colorchange">Rating: <span id="disprange"></span></p>
+            <i id="emoji" class='far fa-angry' style="font-size:48px"></i>
+            <br>
+            <script>
+              var slider = document.getElementById('rating');
+              var display = document.getElementById('disprange');
+              var emoji = document.getElementById('emoji');
+              display.innerHTML = slider.value;
+              x=document.getElementById('colorchange');
+              x.style.color="#c90000";
+              slider.oninput = function(){
+                display.innerHTML = this.value;
+                if(this.value=="0"||this.value=="1"){
+                  x.style.color="#c90000";
+                  emoji.className = "far fa-frown";
+                }
+                else if(this.value=="2"||this.value=="3"){
+                  x.style.color="#de4707";
+                }
+                else if(this.value=="4"||this.value=="5"){
+                  x.style.color="#059c1b";
+                }
+                if(this.value=="0")
+                emoji.className = "far fa-angry";
+                else if(this.value=="1")
+                emoji.className = "far fa-frown";
+               	else if(this.value=="2")
+                emoji.className = "far fa-frown-open";
+                else if(this.value=="3")
+                emoji.className = "far fa-grin";
+                else if(this.value=="4")
+                emoji.className = "far fa-grin-beam";
+                else
+                emoji.className = "far fa-grin-hearts";
+              }
+            </script>
+            <p>Please write your feedback on our services </p>
+            <textarea maxlength="300" name="feedback" id="feedback" rows="10" cols="100" placeholder="Maximum limit:150 characters"></textarea>
+            <br><br>
+            <input id="reset" type="reset" name="reset">
+            <input id="submit" type="submit" name="submit">
+            <br><br>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

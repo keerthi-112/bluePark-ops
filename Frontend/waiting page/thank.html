@@ -1,0 +1,28 @@
+<html>
+   <head>
+    <link rel="stylesheet" type="text/css" href="thank.css">
+      <script>
+         setTimeout(function(){
+            window.location.href ="surveyForm.html";
+         }, 16000);
+         var timeleft = 15;
+var downloadTimer = setInterval(function(){
+		  if(timeleft <= 0){
+    clearInterval(downloadTimer);
+    document.getElementById("countdown").innerHTML = "Finished";
+  } else {
+    document.getElementById("countdown").innerHTML = timeleft + " seconds remaining";
+  }
+  timeleft -= 1;
+}, 1000);
+      </script>
+   </head>
+   <body>
+      <div class="ti">
+         <h1>Thank You for your Purchase</h1>
+         <p>Please Leave your Valuable Feedback</p>
+		 <p>You will be directed to Survey Form in:<span id="countdown"></span>
+      </div>
+	  
+   </body>
+</html>
