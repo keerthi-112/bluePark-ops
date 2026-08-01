@@ -10,6 +10,36 @@ The runnable application lives at **`Backend/bluepark/`**. All commands below as
 
 **App layout** — one Django app per domain, each following the same internal shape: `models.py` → `services.py` (business logic, the only thing views/API call) → `api.py` + `serializers.py` (DRF) → `views.py` (server-rendered pages) → `signals.py` where one app needs to react to another without a direct dependency (e.g. `inventory` deducting stock when `orders` fires its `order_placed` signal, without `orders` needing to know `inventory` exists):
 
+                    Browser
+                        │
+         ┌──────────────┴──────────────┐
+         │                             │
+   Server-rendered Pages          REST APIs
+         │                             │
+         └──────────────┬──────────────┘
+                        │
+                  Django Services
+                        │
+      ┌─────────────────┼─────────────────┐
+      │                 │                 │
+  Orders          Inventory         Analytics
+      │                 │                 │
+      └──────────────┬──┴─────────────────┘
+                     │
+             PostgreSQL / SQLite
+                     │
+             Django Channels
+                     │
+                Redis (Prod)
+                     │
+              WebSocket Clients
+
+               AI Operations Copilot
+                     │
+            Context Builder
+                     │
+             Google Gemini API
+
 | App | Owns |
 |---|---|
 | `core` | Shared base model, role-based DRF permission classes, the Phase 2 "Overview" snapshot dashboard |
