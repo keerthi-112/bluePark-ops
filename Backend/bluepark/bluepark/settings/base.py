@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'staff.apps.StaffConfig',
     'notifications.apps.NotificationsConfig',
     'analytics.apps.AnalyticsConfig',
+    'ai_copilot.apps.AiCopilotConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'core.pagination.StandardResultsPagination',
     'PAGE_SIZE': 20,
 }
+
+
+# AI Operations Copilot
+# https://ai.google.dev/gemini-api/docs -- get a key, put it in .env,
+# never commit it. AI_PROVIDER selects which ai_copilot.providers class
+# get_provider() returns; 'gemini' is the only one implemented today,
+# but nothing outside ai_copilot/providers.py needs to change to add
+# another.
+AI_PROVIDER = env('AI_PROVIDER', default='gemini')
+GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
+GEMINI_MODEL = env('GEMINI_MODEL', default='gemini-2.0-flash')
